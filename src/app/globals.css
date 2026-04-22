@@ -1,27 +1,174 @@
+/* ─────────────────────────────────────────────────────────────
+   globals.css — Base styles for the project
+   All colors reference the custom palette defined in tailwind.config.ts
+   ───────────────────────────────────────────────────────────── */
+
+/* 1. Tailwind's three layers — always at the top */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* 2. CSS Custom Properties (design tokens as CSS vars)
+      These mirror the Tailwind palette so you can also use them
+      directly in plain CSS when needed: var(--color-sage), etc.    */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Palette */
+  --color-sage:      #87A878;
+  --color-skyblue:   #6BA3BE;
+  --color-lavender:  #B8A9C9;
+  --color-cream:     #FAF3E0;
+  --color-dark:      #2D2D2D;
+
+  /* Semantic aliases — swap these for theming or dark mode */
+  --bg-page:         var(--color-cream);
+  --bg-surface:      #FEFAF2;          /* cream-light */
+  --text-primary:    var(--color-dark);
+  --text-muted:      #6b6b6b;
+  --border-default:  #E8DFC8;          /* slightly darker than cream */
+  --accent-primary:  var(--color-sage);
+  --accent-secondary:var(--color-skyblue);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* 3. Base element resets — applied inside Tailwind's @base layer */
+@layer base {
+  /* Smooth rendering on all text */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Root page background & text */
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--bg-page);   /* #FAF3E0 cream */
+    color: var(--text-primary);         /* #2D2D2D dark  */
+  }
+
+  body {
+    min-height: 100dvh;
+    line-height: 1.6;
+  }
+
+  /* Heading scale — dark color by default */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-dark);
+    line-height: 1.2;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  /* Links — skyblue with sage on hover */
+  a {
+    color: var(--color-skyblue);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 150ms ease;
+  }
+  a:hover {
+    color: var(--color-sage);
+  }
+
+  /* Horizontal rule — uses cream-dark */
+  hr {
+    border: none;
+    border-top: 1px solid #E8DFC8;
+    margin: 2rem 0;
+  }
+
+  /* Code blocks — dark bg, cream text */
+  code, kbd, samp, pre {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.875em;
+    background-color: var(--color-dark);
+    color: var(--color-cream);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+  }
+  pre {
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* Focus ring — accessible & on-brand */
+  :focus-visible {
+    outline: 2px solid var(--color-sage);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Selection highlight — lavender */
+  ::selection {
+    background-color: #B8A9C940;   /* lavender at 25% opacity */
+    color: var(--color-dark);
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+/* 4. Reusable component classes — Tailwind @components layer
+      Use these as className shortcuts: className="btn-primary"   */
+@layer components {
+  /* Primary button — sage fill */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg px-5 py-2.5 text-sm font-semibold
+           bg-sage text-white
+           hover:bg-sage-dark active:scale-[0.97]
+           transition-all duration-150 cursor-pointer;
+  }
+
+  /* Secondary button — outlined skyblue */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg px-5 py-2.5 text-sm font-semibold
+           border border-skyblue text-skyblue
+           hover:bg-skyblue hover:text-white active:scale-[0.97]
+           transition-all duration-150 cursor-pointer;
+  }
+
+  /* Card — cream-light surface with subtle shadow */
+  .card {
+    @apply rounded-2xl bg-cream-light border border-cream-dark
+           p-6 shadow-sm;
+  }
+
+  /* Section container — max-width + horizontal padding */
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Tag / badge — lavender tint */
+  .tag {
+    @apply inline-flex items-center rounded-full
+           bg-lavender/20 text-lavender-dark
+           px-3 py-0.5 text-xs font-medium;
+  }
 }
 
+/* 5. Custom utilities — extend Tailwind with one-off helpers */
 @layer utilities {
+  /* Balanced text wrapping for headings */
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Gradient text using palette colors */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-sage), var(--color-skyblue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Subtle page-section alternating background */
+  .section-alt {
+    background-color: var(--bg-surface);
   }
 }
