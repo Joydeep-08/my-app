@@ -1064,36 +1064,42 @@ export default function Step4Preview({
 
   // Called by FinalizeModal after Razorpay confirms payment on client
   async function handlePaymentSuccess(paymentData: {
-    razorpay_order_id: string;
-    razorpay_payment_id: string;
-    razorpay_signature: string;
-  }) {
-    setShowFinalizeModal(false);
-    setIsFinalizingPayment(true);
-    setFinalizeError("");
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}) {
+  setShowFinalizeModal(false);
+  setIsFinalizingPayment(true);
+  setFinalizeError("");
 
-    try {
-      const res = await fetch("/api/finalize-surprise", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...paymentData,
-          // Prompt 15 will add: recipientName, occasion, balloons, finalMessage
-        }),
-      });
+  try {
+    const res = await fetch("/api/finalize-surprise", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...paymentData,
+        recipientName,
+        occasion,
+        finalMessage,
+        balloons,
+      }),
+    });
 
-      if (!res.ok) throw new Error("Finalize failed. Please contact support.");
-      const data = await res.json();
-
-      // Prompt 15 will redirect to: /dashboard/success?slug=data.slug
-      // For now show a success alert
-      alert(`🎉 Payment successful! Surprise ID: ${paymentData.razorpay_payment_id}\nSave logic comes in Prompt 15.`);
-    } catch (err) {
-      setFinalizeError(err instanceof Error ? err.message : "Something went wrong finalizing your surprise.");
-    } finally {
-      setIsFinalizingPayment(false);
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.error || "Finalize failed. Please contact support.");
     }
+
+    const data = await res.json();
+    window.location.href = `/dashboard/success?slug=${data.slug}`;
+
+  } catch (err) {
+    setFinalizeError(
+      err instanceof Error ? err.message : "Something went wrong finalizing your surprise."
+    );
+    setIsFinalizingPayment(false);
   }
+}
 
   return (
     <div className="preview-root">

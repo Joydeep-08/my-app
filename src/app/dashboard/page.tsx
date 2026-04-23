@@ -56,22 +56,35 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function loadProfile() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { router.push("/login"); return; }
-      const user = session.user;
-      const { data } = await supabase
-        .from("users")
-        .select("name, email, avatar_url")
-        .eq("id", user.id)
-        .single();
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { router.push("/login"); return; }
 
-      setProfile({
-        name: data?.name || user.user_metadata?.full_name || user.email?.split("@")[0] || "Friend",
-        email: data?.email || user.email || "",
-        avatar_url: data?.avatar_url || user.user_metadata?.avatar_url || null,
-      });
-      setLoading(false);
-    }
+  const user = session.user;
+
+  // ✅ STEP 1: Ensure user exists in DB
+  await supabase.from("users").upsert({
+    id: user.id,
+    email: user.email,
+    name: user.user_metadata?.full_name || "",
+    avatar_url: user.user_metadata?.avatar_url || null,
+  });
+
+  // ✅ STEP 2: Now fetch safely
+  const { data } = await supabase
+    .from("users")
+    .select("name, email, avatar_url")
+    .eq("id", user.id)
+    .single();
+
+  setProfile({
+    name: data?.name || user.user_metadata?.full_name || user.email?.split("@")[0] || "Friend",
+    email: data?.email || user.email || "",
+    avatar_url: data?.avatar_url || user.user_metadata?.avatar_url || null,
+  });
+
+  setLoading(false);
+}
+
     loadProfile();
   }, []);
 
