@@ -304,7 +304,7 @@ function PopScreen({
       balloonIndex,
     };
 
-    const newPopped = new Set([...popped, id]);
+    const newPopped = new Set(Array.from(popped).concat(id));
     const newOrder = [...popOrder, id];
     poppedContentRef.current.set(id, content);
     setPopOrder(newOrder);
