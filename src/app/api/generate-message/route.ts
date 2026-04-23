@@ -1,28 +1,31 @@
 // app/api/generate-message/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import Groq from "groq-sdk";
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
 
 export async function POST(req: NextRequest) {
-  const { recipientName, occasion } = await req.json();
+  try {
+    const { recipientName, occasion } = await req.json();
 
-  if (!recipientName || !occasion) {
-    return NextResponse.json(
-      { error: "recipientName and occasion are required" },
-      { status: 400 }
-    );
-  }
+    if (!recipientName || !occasion) {
+      return NextResponse.json(
+        { error: "recipientName and occasion are required" },
+        { status: 400 }
+      );
+    }
 
-  const response = await groq.chat.completions.create({
-    model: "llama-3.1-8b-instant",
-    max_tokens: 400,
-    messages: [
-      {
-        role: "user",
-        content: `Write a warm, heartfelt closing message for a digital surprise gift.
+    // ✅ dynamic import (prevents build-time execution)
+    const { default: Groq } = await import("groq-sdk");
+
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY!,
+    });
+
+    const response = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      max_tokens: 400,
+      messages: [
+        {
+          role: "user",
+          content: `Write a warm, heartfelt closing message for a digital surprise gift.
 The recipient's name is: ${recipientName}
 The occasion is: ${occasion}
 Requirements:
@@ -32,18 +35,25 @@ Requirements:
 - End with a single celebratory sentence
 - Plain text only, no bullet points, no markdown
 - Keep it under 750 characters`,
-      },
-    ],
-  });
+        },
+      ],
+    });
 
-  const message = response.choices[0]?.message?.content?.trim() ?? "";
+    const message = response.choices[0]?.message?.content?.trim() ?? "";
 
-  if (!message) {
+    if (!message) {
+      return NextResponse.json(
+        { error: "No message generated" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ message });
+  } catch (err) {
+    console.error("Groq error:", err);
     return NextResponse.json(
-      { error: "No message generated" },
+      { error: "Failed to generate message" },
       { status: 500 }
     );
   }
-
-  return NextResponse.json({ message });
 }
