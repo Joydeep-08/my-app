@@ -1,5 +1,7 @@
 "use client";
 
+import Step4Preview from "./Step4Preview";
+
 import { useState, useRef, useCallback } from "react";
 import Cropper from "react-easy-crop";
 
@@ -243,10 +245,12 @@ function Step2({
   recipientName,
   occasion,
   onBack,
+  onContinue,
 }: {
   recipientName: string;
   occasion: string;
   onBack: () => void;
+  onContinue: (balloons: Balloon[]) => void;
 }) {
   const [balloons, setBalloons] = useState<Balloon[]>(
     Array.from({ length: MIN_BALLOONS }, makeBalloon)
@@ -454,7 +458,7 @@ function Step2({
           </button>
 
           {canContinue && (
-            <button className="next-btn" onClick={() => alert("Step 3 coming in Prompt 11!")}>
+            <button className="next-btn" onClick={() => onContinue(balloons)}>
               <span>Continue</span>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path d="M4 9h10M9 4l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -953,11 +957,357 @@ function Step2({
   );
 }
 
+// ─── Step 3 ───────────────────────────────────────────────────────────────────
+function Step3({
+  recipientName,
+  occasion,
+  balloons,
+  onBack,
+  onContinue,
+}: {
+  recipientName: string;
+  occasion: string;
+  balloons: Balloon[];
+  onBack: () => void;
+  onContinue: (finalMessage: string) => void;
+}) {
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const MAX_MSG = 850;
+
+  async function generateMessage() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/generate-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipientName, occasion }),
+      });
+      if (!res.ok) throw new Error("Generation failed");
+      const data = await res.json();
+      setMessage(data.message);
+    } catch {
+      setError("Couldn't generate a message. You can write one yourself below!");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Auto-generate once when Step 3 mounts
+  const hasFetched = useRef(false);
+  if (!hasFetched.current) {
+    hasFetched.current = true;
+    // Schedule after paint so React finishes rendering first
+    Promise.resolve().then(generateMessage);
+  }
+
+  return (
+    <div className="create-page">
+      {/* Background blobs */}
+      <div className="blob blob-1" />
+      <div className="blob blob-2" />
+      <div className="blob blob-3" />
+
+      {/* Floating confetti dots */}
+      {Array.from({ length: 18 }).map((_, i) => (
+        <span key={i} className={`confetti-dot dot-${i}`} />
+      ))}
+
+      <div className="create-card step3-card">
+        {/* Step indicator */}
+        <div className="step-indicator">
+          {[1, 2, 3].map((s) => (
+            <div key={s} className="step-item">
+              <div className={`step-circle ${s === 3 ? "active" : "done"}`}>
+                {s < 3 ? (
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M2 7l3.5 3.5L12 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  s
+                )}
+              </div>
+              {s < 3 && <div className="step-line done" />}
+            </div>
+          ))}
+        </div>
+        <p className="step-label">Step 3 of 3 — The final message ✨</p>
+
+        {/* Header */}
+        <header className="create-header">
+          <h1 className="create-title">
+            Final Message
+            <span className="title-emoji">💌</span>
+          </h1>
+          <p className="create-subtitle">
+            A heartfelt closing note for <strong style={{ color: "#87A878", fontStyle: "normal" }}>{recipientName}</strong> —
+            AI-crafted, but yours to edit.
+          </p>
+        </header>
+
+        {/* Message area */}
+        <div className="s3-message-section">
+          {loading ? (
+            <div className="s3-spinner-wrap">
+              <div className="s3-spinner" />
+              <p className="s3-spinner-label">Crafting a warm message for {recipientName}…</p>
+            </div>
+          ) : (
+            <>
+              {error && (
+                <p className="s3-error">{error}</p>
+              )}
+              <div className="s3-textarea-wrap">
+                <textarea
+                  className="s3-textarea"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value.slice(0, MAX_MSG))}
+                  placeholder="Your heartfelt message will appear here…"
+                  rows={8}
+                />
+                <div className="s3-textarea-footer">
+                  <button
+                    className="s3-regen-btn"
+                    onClick={generateMessage}
+                    title="Generate a new message"
+                  >
+                    ↺ Regenerate
+                  </button>
+                  <span className={`s3-char-counter ${message.length >= MAX_MSG - 20 ? "counter-warn" : ""}`}>
+                    {message.length}/{MAX_MSG}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="step2-actions">
+          <button className="back-btn" onClick={onBack}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M12 8H4M8 4L4 8l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Back
+          </button>
+
+          {!loading && (
+            <button
+              className="next-btn s3-preview-btn"
+              onClick={() => onContinue(message)}
+              disabled={!message.trim()}
+            >
+              <span>Ready to Preview!</span>
+              <span style={{ fontSize: "1.1rem" }}>✨</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      <style jsx>{`
+        /* ── Reuse page shell + blob + confetti from Step1/2 ── */
+        .create-page {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #faf3e0 0%, #e8f4f0 50%, #e8eef6 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem 1rem;
+          position: relative;
+          overflow: hidden;
+          font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        .blob {
+          position: fixed;
+          border-radius: 50%;
+          filter: blur(70px);
+          opacity: 0.35;
+          animation: blobDrift 12s ease-in-out infinite alternate;
+          pointer-events: none;
+        }
+        .blob-1 { width: 420px; height: 420px; background: #87A878; top: -120px; left: -100px; animation-duration: 14s; }
+        .blob-2 { width: 340px; height: 340px; background: #6BA3BE; bottom: -80px; right: -80px; animation-duration: 11s; animation-delay: -4s; }
+        .blob-3 { width: 260px; height: 260px; background: #B8A9C9; top: 50%; left: 60%; animation-duration: 16s; animation-delay: -8s; }
+        @keyframes blobDrift {
+          from { transform: translate(0,0) scale(1); }
+          to { transform: translate(30px,-30px) scale(1.08); }
+        }
+        .confetti-dot {
+          position: fixed; width: 8px; height: 8px; border-radius: 50%;
+          pointer-events: none; animation: floatDot linear infinite; opacity: 0.55;
+        }
+        ${Array.from({ length: 18 }).map((_, i) => {
+          const colors = ["#87A878","#6BA3BE","#B8A9C9","#FAD4A0","#F8B4C8"];
+          return `.dot-${i}{left:${(i*5.5+2)%100}%;bottom:-10px;width:${5+(i%6)}px;height:${5+(i%6)}px;background:${colors[i%colors.length]};animation-duration:${6+(i%8)}s;animation-delay:${-(i*0.9)}s;}`;
+        }).join("")}
+        @keyframes floatDot {
+          from { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+          80% { opacity: 0.5; }
+          to { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ── Card ── */
+        .create-card {
+          background: rgba(255,255,255,0.72);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          border: 1.5px solid rgba(255,255,255,0.85);
+          border-radius: 28px;
+          box-shadow: 0 8px 32px rgba(107,163,190,0.18), 0 2px 8px rgba(0,0,0,0.06);
+          padding: 2.5rem 2.25rem 2.75rem;
+          width: 100%;
+          max-width: 500px;
+          position: relative;
+          z-index: 1;
+          animation: cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .step3-card { max-width: 540px; }
+        @keyframes cardIn {
+          from { opacity: 0; transform: translateY(28px) scale(0.97); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ── Step indicator (reuse exact classes) ── */
+        .step-indicator { display: flex; align-items: center; justify-content: center; margin-bottom: 0.4rem; }
+        .step-item { display: flex; align-items: center; }
+        .step-circle {
+          width: 32px; height: 32px; border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 0.8rem; font-weight: 700; font-family: 'Courier New', monospace;
+          border: 2px solid #d0cfc8; background: white; color: #aaa; transition: all 0.3s ease;
+        }
+        .step-circle.active { background: #87A878; border-color: #87A878; color: white; box-shadow: 0 0 0 4px rgba(135,168,120,0.22); }
+        .step-circle.done { background: #6BA3BE; border-color: #6BA3BE; color: white; }
+        .step-line { width: 48px; height: 2px; background: #e0ddd5; margin: 0 2px; transition: background 0.3s ease; }
+        .step-line.done { background: #6BA3BE; }
+        .step-label {
+          text-align: center; font-size: 0.75rem; color: #9a9a8a;
+          letter-spacing: 0.04em; margin: 0.35rem 0 1.6rem;
+          font-family: 'Courier New', monospace; text-transform: uppercase;
+        }
+
+        /* ── Header ── */
+        .create-header { text-align: center; margin-bottom: 1.75rem; }
+        .create-title {
+          font-size: 2rem; font-weight: 700; color: #2D2D2D;
+          line-height: 1.15; margin: 0 0 0.6rem;
+          display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0.3rem;
+        }
+        .title-emoji { margin-left: 0.25rem; font-size: 1.9rem; animation: emojiFloat 3s ease-in-out infinite; display: inline-block; }
+        @keyframes emojiFloat {
+          0%, 100% { transform: translateY(0) rotate(-5deg); }
+          50% { transform: translateY(-6px) rotate(5deg); }
+        }
+        .create-subtitle { font-size: 0.88rem; color: #777; margin: 0; line-height: 1.55; font-family: 'Georgia', serif; font-style: italic; }
+
+        /* ── Spinner ── */
+        .s3-spinner-wrap {
+          display: flex; flex-direction: column; align-items: center;
+          gap: 1rem; padding: 2.5rem 0;
+        }
+        .s3-spinner {
+          width: 44px; height: 44px; border-radius: 50%;
+          border: 3px solid #e0ddd5;
+          border-top-color: #87A878;
+          animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .s3-spinner-label {
+          font-size: 0.85rem; color: #999; font-family: 'Courier New', monospace;
+          font-style: italic; text-align: center;
+        }
+
+        /* ── Error ── */
+        .s3-error {
+          font-size: 0.78rem; color: #e07070; margin: 0 0 0.75rem;
+          font-family: 'Courier New', monospace; text-align: center;
+        }
+
+        /* ── Message section ── */
+        .s3-message-section { margin-bottom: 1.5rem; }
+        .s3-textarea-wrap { position: relative; }
+        .s3-textarea {
+          width: 100%; box-sizing: border-box;
+          padding: 1rem 1rem 2.5rem;
+          border: 2px solid #e0ddd5; border-radius: 14px;
+          font-size: 0.95rem; line-height: 1.65;
+          font-family: 'Georgia', serif; color: #2D2D2D;
+          background: rgba(255,255,255,0.85);
+          resize: vertical; outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s;
+          animation: textareaIn 0.45s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @keyframes textareaIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .s3-textarea:focus { border-color: #B8A9C9; box-shadow: 0 0 0 3px rgba(184,169,201,0.2); }
+        .s3-textarea::placeholder { color: #ccc; font-style: italic; }
+        .s3-textarea-footer {
+          position: absolute; bottom: 0.6rem; left: 0.75rem; right: 0.75rem;
+          display: flex; align-items: center; justify-content: space-between;
+        }
+        .s3-regen-btn {
+          background: none; border: none; padding: 0;
+          font-size: 0.72rem; font-family: 'Courier New', monospace;
+          color: #B8A9C9; cursor: pointer; letter-spacing: 0.03em;
+          transition: color 0.15s;
+        }
+        .s3-regen-btn:hover { color: #87A878; }
+        .s3-char-counter {
+          font-size: 0.68rem; font-family: 'Courier New', monospace;
+          color: #ccc; transition: color 0.2s;
+        }
+        .s3-char-counter.counter-warn { color: #e07070; }
+
+        /* ── Actions (reuse step2-actions + back-btn + next-btn) ── */
+        .step2-actions {
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 1rem; margin-top: 0.25rem;
+        }
+        .back-btn {
+          display: flex; align-items: center; gap: 0.4rem;
+          padding: 0.75rem 1.25rem; background: rgba(255,255,255,0.7);
+          border: 1.5px solid #e0ddd5; border-radius: 12px;
+          font-size: 0.9rem; font-family: 'Courier New', monospace;
+          color: #888; cursor: pointer; transition: background 0.2s, color 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.95); color: #555; }
+        .next-btn {
+          display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+          padding: 0.85rem 1.5rem;
+          background: linear-gradient(135deg, #87A878, #6BA3BE);
+          color: white; border: none; border-radius: 14px;
+          font-size: 1rem; font-weight: 700; font-family: 'Courier New', monospace;
+          letter-spacing: 0.04em; cursor: pointer;
+          transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s;
+          box-shadow: 0 4px 18px rgba(107,163,190,0.3);
+        }
+        .next-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(107,163,190,0.38); }
+        .next-btn:active { transform: translateY(0); opacity: 0.88; }
+        .next-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+        .s3-preview-btn { background: linear-gradient(135deg, #B8A9C9, #87A878); }
+
+        @media (max-width: 520px) {
+          .create-card { padding: 2rem 1.25rem 2.25rem; border-radius: 20px; }
+          .create-title { font-size: 1.55rem; }
+          .step-line { width: 32px; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function CreatePage() {
   const [step, setStep] = useState(1);
   const [recipientName, setRecipientName] = useState("");
   const [occasion, setOccasion] = useState("");
+  const [balloons, setBalloons] = useState<Balloon[]>([]);
+  const [finalMessage, setFinalMessage] = useState("");
   const [errors, setErrors] = useState<{ name?: string; occasion?: string }>({});
 
   function validate() {
@@ -976,6 +1326,32 @@ export default function CreatePage() {
     setErrors({});
     setStep(2);
   }
+   // ── Render Step 4 ──
+if (step === 4)
+  return (
+    <Step4Preview
+      recipientName={recipientName}
+      occasion={occasion}
+      balloons={balloons}
+      finalMessage={finalMessage}
+      onEditSurprise={() => setStep(2)}
+    />
+  );
+  
+  // ── Render Step 3 ──
+  if (step === 3)
+    return (
+      <Step3
+        recipientName={recipientName}
+        occasion={occasion}
+        balloons={balloons}
+        onBack={() => setStep(2)}
+        onContinue={(msg) => {
+          setFinalMessage(msg);
+          setStep(4); // Step 4 (Preview) — coming in Prompt 12
+        }}
+      />
+    );
 
   // ── Render Step 2 ──
   if (step === 2)
@@ -984,6 +1360,10 @@ export default function CreatePage() {
         recipientName={recipientName}
         occasion={occasion}
         onBack={() => setStep(1)}
+        onContinue={(b) => {
+          setBalloons(b);
+          setStep(3);
+        }}
       />
     );
 
