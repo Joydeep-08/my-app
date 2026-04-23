@@ -18,22 +18,292 @@ interface Step4Props {
   onEditSurprise: () => void;
 }
 
-// ─── Balloon colours ──────────────────────────────────────────────────────────
-const BALLOON_COLORS = [
-  { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
-  { body: "#6BA3BE", shine: "#8ec0d8", string: "#4a7a96" },
-  { body: "#B8A9C9", shine: "#d0c4de", string: "#8a7aa0" },
-  { body: "#F4A261", shine: "#f7bc8a", string: "#c07840" },
-  { body: "#E8A0BF", shine: "#f0bdd4", string: "#b87898" },
-  { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
-  { body: "#6BA3BE", shine: "#8ec0d8", string: "#4a7a96" },
-  { body: "#B8A9C9", shine: "#d0c4de", string: "#8a7aa0" },
-  { body: "#F4A261", shine: "#f7bc8a", string: "#c07840" },
-];
+// ─── Theme System (mirrored from recipient page) ──────────────────────────────
+const THEMES: Record<string, {
+  gradient: string;
+  cardBg: string;
+  accent: string;
+  accentShine: string;
+  accentString: string;
+  text: string;
+  subtext: string;
+  border: string;
+  confettiColors: string[];
+  floatingEmojis: string[];
+  balloonColors: { body: string; shine: string; string: string }[];
+  label: string;
+  tagline: string;
+  starColors: string[];
+}> = {
+  Birthday: {
+    gradient: "linear-gradient(135deg, #faf3e0 0%, #fde8c8 50%, #e8f0f8 100%)",
+    cardBg: "rgba(255,245,230,0.92)",
+    accent: "#F4A261",
+    accentShine: "#f7bc8a",
+    accentString: "#c07840",
+    text: "#2D2D2D",
+    subtext: "#7A4528",
+    border: "rgba(244,162,97,0.3)",
+    confettiColors: ["#F4A261", "#f7bc8a", "#E8704A", "#FFCE4A", "#FF7043"],
+    floatingEmojis: ["🎈", "🎂", "🎉", "✨", "🎊", "🥳", "⭐"],
+    balloonColors: [
+      { body: "#F4A261", shine: "#f7bc8a", string: "#c07840" },
+      { body: "#E8704A", shine: "#f0946e", string: "#b85030" },
+      { body: "#FFCE4A", shine: "#ffe07a", string: "#c09a20" },
+      { body: "#FF8C69", shine: "#ffaa8a", string: "#c06050" },
+      { body: "#F4A261", shine: "#f7bc8a", string: "#c07840" },
+      { body: "#E8704A", shine: "#f0946e", string: "#b85030" },
+      { body: "#FFCE4A", shine: "#ffe07a", string: "#c09a20" },
+      { body: "#FF8C69", shine: "#ffaa8a", string: "#c06050" },
+      { body: "#F4A261", shine: "#f7bc8a", string: "#c07840" },
+    ],
+    label: "Birthday",
+    tagline: "It's time to celebrate YOU! 🎂",
+    starColors: ["#FFCE4A", "#F4A261", "#fff"],
+  },
+  Anniversary: {
+    gradient: "linear-gradient(135deg, #faf3e0 0%, #f5e8dc 50%, #ede0f0 100%)",
+    cardBg: "rgba(255,250,245,0.93)",
+    accent: "#C9A0A0",
+    accentShine: "#ddbfbf",
+    accentString: "#a07878",
+    text: "#3D2015",
+    subtext: "#7A5040",
+    border: "rgba(201,160,160,0.3)",
+    confettiColors: ["#C9A0A0", "#E8D5C4", "#C4A882", "#D4B896", "#F2E6D9"],
+    floatingEmojis: ["💍", "🌹", "✨", "🕯️", "💫", "🥂", "💝"],
+    balloonColors: [
+      { body: "#C9A0A0", shine: "#ddbfbf", string: "#a07878" },
+      { body: "#E8D5C4", shine: "#f0e4d8", string: "#c0a898" },
+      { body: "#C4A882", shine: "#d8c09e", string: "#a08060" },
+      { body: "#D4A5A5", shine: "#e0bfbf", string: "#a07878" },
+      { body: "#E6C9B8", shine: "#f0d8cc", string: "#c0a090" },
+      { body: "#C9A0A0", shine: "#ddbfbf", string: "#a07878" },
+      { body: "#E8D5C4", shine: "#f0e4d8", string: "#c0a898" },
+      { body: "#C4A882", shine: "#d8c09e", string: "#a08060" },
+      { body: "#D4A5A5", shine: "#e0bfbf", string: "#a07878" },
+    ],
+    label: "Anniversary",
+    tagline: "Every moment with you is a treasure 💍",
+    starColors: ["#E8D5C4", "#C4A882", "#fff8f0"],
+  },
+  Farewell: {
+    gradient: "linear-gradient(135deg, #faf3e0 0%, #e8f4f0 50%, #e8eef6 100%)",
+    cardBg: "rgba(245,248,242,0.93)",
+    accent: "#6BA3BE",
+    accentShine: "#8ec0d8",
+    accentString: "#4a7a96",
+    text: "#1E2D1E",
+    subtext: "#3D5040",
+    border: "rgba(107,163,190,0.3)",
+    confettiColors: ["#87A878", "#6BA3BE", "#C4B896", "#A8C4A0", "#8FA8C4"],
+    floatingEmojis: ["🌅", "✈️", "🌿", "⭐", "🌙", "🍃", "💫"],
+    balloonColors: [
+      { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
+      { body: "#6BA3BE", shine: "#8ec0d8", string: "#4a7a96" },
+      { body: "#B8A9C9", shine: "#d0c4de", string: "#8a7aa0" },
+      { body: "#C4B896", shine: "#d8ceb0", string: "#a09070" },
+      { body: "#8FA8C4", shine: "#aac4d8", string: "#6a88a0" },
+      { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
+      { body: "#6BA3BE", shine: "#8ec0d8", string: "#4a7a96" },
+      { body: "#B8A9C9", shine: "#d0c4de", string: "#8a7aa0" },
+      { body: "#C4B896", shine: "#d8ceb0", string: "#a09070" },
+    ],
+    label: "Farewell",
+    tagline: "New adventures await you 🌅",
+    starColors: ["#C4B896", "#87A878", "#e8f0e8"],
+  },
+  Wedding: {
+    gradient: "linear-gradient(135deg, #faf3e0 0%, #f5f0e8 50%, #ede8f5 100%)",
+    cardBg: "rgba(255,253,248,0.95)",
+    accent: "#C8A878",
+    accentShine: "#dcc89a",
+    accentString: "#a08050",
+    text: "#2A1E0A",
+    subtext: "#6A4E28",
+    border: "rgba(200,168,120,0.3)",
+    confettiColors: ["#F5F0E8", "#EDD9B8", "#D4C4A0", "#FFFFFF", "#C8B896"],
+    floatingEmojis: ["💒", "💐", "✨", "🌸", "💍", "🕊️", "⭐"],
+    balloonColors: [
+      { body: "#F5F0E8", shine: "#fff8f0", string: "#c8b896" },
+      { body: "#EDD9B8", shine: "#f8eed0", string: "#c0a880" },
+      { body: "#D4C4A0", shine: "#e8d8b8", string: "#a89870" },
+      { body: "#F0E8D8", shine: "#fff4e8", string: "#c8b898" },
+      { body: "#E8D8C0", shine: "#f8ecd8", string: "#c0a888" },
+      { body: "#F5F0E8", shine: "#fff8f0", string: "#c8b896" },
+      { body: "#EDD9B8", shine: "#f8eed0", string: "#c0a880" },
+      { body: "#D4C4A0", shine: "#e8d8b8", string: "#a89870" },
+      { body: "#F0E8D8", shine: "#fff4e8", string: "#c8b898" },
+    ],
+    label: "Wedding",
+    tagline: "Two hearts, one beautiful story 💒",
+    starColors: ["#EDD9B8", "#D4C4A0", "#fffdf5"],
+  },
+  "Valentine's Day": {
+    gradient: "linear-gradient(135deg, #fdf0f0 0%, #fae0e0 50%, #f5e0f0 100%)",
+    cardBg: "rgba(255,248,248,0.93)",
+    accent: "#C85A5A",
+    accentShine: "#e08080",
+    accentString: "#a03838",
+    text: "#2A0A0A",
+    subtext: "#6A2828",
+    border: "rgba(200,90,90,0.3)",
+    confettiColors: ["#C85A5A", "#E8A0A0", "#F5D5C8", "#FF6B6B", "#FFB8B8"],
+    floatingEmojis: ["❤️", "💕", "🌹", "💋", "✨", "💝", "🌸"],
+    balloonColors: [
+      { body: "#C85A5A", shine: "#e08080", string: "#a03838" },
+      { body: "#E8A0A0", shine: "#f0bfbf", string: "#c07878" },
+      { body: "#F5D5C8", shine: "#ffe8e0", string: "#d0a898" },
+      { body: "#FF8080", shine: "#ffa0a0", string: "#cc5858" },
+      { body: "#FFB8B8", shine: "#ffcece", string: "#d08888" },
+      { body: "#C85A5A", shine: "#e08080", string: "#a03838" },
+      { body: "#E8A0A0", shine: "#f0bfbf", string: "#c07878" },
+      { body: "#F5D5C8", shine: "#ffe8e0", string: "#d0a898" },
+      { body: "#FF8080", shine: "#ffa0a0", string: "#cc5858" },
+    ],
+    label: "Valentine's Day",
+    tagline: "With all my love, for you 💕",
+    starColors: ["#E8A0A0", "#F5D5C8", "#fff0f0"],
+  },
+  "Women's Day": {
+    gradient: "linear-gradient(135deg, #f5f0ff 0%, #ffe0f5 50%, #e8f5e8 100%)",
+    cardBg: "rgba(250,245,255,0.93)",
+    accent: "#9878A8",
+    accentShine: "#b898c8",
+    accentString: "#785888",
+    text: "#1E0A2A",
+    subtext: "#4A2862",
+    border: "rgba(152,120,168,0.3)",
+    confettiColors: ["#B8A0C8", "#D4A8C8", "#87A878", "#C8B8D8", "#A890C0"],
+    floatingEmojis: ["🌸", "💜", "🌿", "✨", "🦋", "🌺", "⭐"],
+    balloonColors: [
+      { body: "#B8A0C8", shine: "#cebede", string: "#907898" },
+      { body: "#D4A8C8", shine: "#e8c4e0", string: "#a87898" },
+      { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
+      { body: "#C8A0B8", shine: "#debece", string: "#a07888" },
+      { body: "#A890C0", shine: "#c0aad8", string: "#806890" },
+      { body: "#B8A0C8", shine: "#cebede", string: "#907898" },
+      { body: "#D4A8C8", shine: "#e8c4e0", string: "#a87898" },
+      { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
+      { body: "#C8A0B8", shine: "#debece", string: "#a07888" },
+    ],
+    label: "Women's Day",
+    tagline: "Celebrating the incredible you 🌸",
+    starColors: ["#D4A8C8", "#B8A0C8", "#f5eeff"],
+  },
+  "Mother's Day": {
+    gradient: "linear-gradient(135deg, #fff8f0 0%, #ffeee0 50%, #f0ffe8 100%)",
+    cardBg: "rgba(255,252,248,0.94)",
+    accent: "#D4826A",
+    accentShine: "#e8a08a",
+    accentString: "#a85848",
+    text: "#2A150A",
+    subtext: "#6A3828",
+    border: "rgba(212,130,106,0.3)",
+    confettiColors: ["#F5C8A8", "#F0E8D8", "#87A878", "#F5B896", "#D4A890"],
+    floatingEmojis: ["🌸", "💐", "☕", "✨", "🌷", "💝", "🌿"],
+    balloonColors: [
+      { body: "#F5C8A8", shine: "#ffe0c0", string: "#c89870" },
+      { body: "#D4A890", shine: "#e8c0a8", string: "#a87868" },
+      { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
+      { body: "#F5B896", shine: "#ffceb0", string: "#c08868" },
+      { body: "#E8C8B0", shine: "#f8dcc8", string: "#c09880" },
+      { body: "#F5C8A8", shine: "#ffe0c0", string: "#c89870" },
+      { body: "#D4A890", shine: "#e8c0a8", string: "#a87868" },
+      { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
+      { body: "#F5B896", shine: "#ffceb0", string: "#c08868" },
+    ],
+    label: "Mother's Day",
+    tagline: "For the woman who means everything 🌷",
+    starColors: ["#F5C8A8", "#F0E8D8", "#fff8f0"],
+  },
+  "Father's Day": {
+    gradient: "linear-gradient(135deg, #f5f0e0 0%, #e8e0c8 50%, #e0ece0 100%)",
+    cardBg: "rgba(248,245,235,0.93)",
+    accent: "#8A6840",
+    accentShine: "#a88458",
+    accentString: "#604820",
+    text: "#1A1408",
+    subtext: "#4A3820",
+    border: "rgba(138,104,64,0.3)",
+    confettiColors: ["#6B7840", "#C4A060", "#8A6840", "#A89060", "#D4B870"],
+    floatingEmojis: ["🏆", "⭐", "🌲", "💪", "🍂", "🎖️", "✨"],
+    balloonColors: [
+      { body: "#6B7840", shine: "#8a9860", string: "#485828" },
+      { body: "#C4A060", shine: "#d8bc80", string: "#987840" },
+      { body: "#8A6840", shine: "#a88458", string: "#604820" },
+      { body: "#A89060", shine: "#c0aa78", string: "#806840" },
+      { body: "#5A7030", shine: "#789050", string: "#384818" },
+      { body: "#6B7840", shine: "#8a9860", string: "#485828" },
+      { body: "#C4A060", shine: "#d8bc80", string: "#987840" },
+      { body: "#8A6840", shine: "#a88458", string: "#604820" },
+      { body: "#A89060", shine: "#c0aa78", string: "#806840" },
+    ],
+    label: "Father's Day",
+    tagline: "To the strongest person I know 🏆",
+    starColors: ["#C4A060", "#8A6840", "#f5f0e0"],
+  },
+  "Friendship Day": {
+    gradient: "linear-gradient(135deg, #fffde0 0%, #fff0c8 50%, #e8f5e0 100%)",
+    cardBg: "rgba(255,252,235,0.93)",
+    accent: "#E8902A",
+    accentShine: "#f0a848",
+    accentString: "#b86810",
+    text: "#1E1408",
+    subtext: "#5A3A10",
+    border: "rgba(232,144,42,0.3)",
+    confettiColors: ["#F5C842", "#F4A234", "#87A878", "#F9D854", "#FFB347"],
+    floatingEmojis: ["🌻", "🎒", "🌈", "✨", "🎵", "🤝", "⭐"],
+    balloonColors: [
+      { body: "#F5C842", shine: "#ffe060", string: "#c09818" },
+      { body: "#F4A234", shine: "#f8bc58", string: "#c07810" },
+      { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
+      { body: "#F9D854", shine: "#ffe870", string: "#c8a828" },
+      { body: "#FFB347", shine: "#ffc868", string: "#cc8018" },
+      { body: "#F5C842", shine: "#ffe060", string: "#c09818" },
+      { body: "#F4A234", shine: "#f8bc58", string: "#c07810" },
+      { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
+      { body: "#F9D854", shine: "#ffe870", string: "#c8a828" },
+    ],
+    label: "Friendship Day",
+    tagline: "Here's to the best humans I know 🌻",
+    starColors: ["#F5C842", "#F4A234", "#fffae0"],
+  },
+  Other: {
+    gradient: "linear-gradient(135deg, #faf3e0 0%, #e8f4f0 50%, #e8eef6 100%)",
+    cardBg: "rgba(255,255,255,0.88)",
+    accent: "#6BA3BE",
+    accentShine: "#8ec0d8",
+    accentString: "#4a7a96",
+    text: "#2D2D2D",
+    subtext: "#3A5060",
+    border: "rgba(107,163,190,0.3)",
+    confettiColors: ["#87A878", "#6BA3BE", "#B8A9C9", "#FAF3E0", "#9BC4D8"],
+    floatingEmojis: ["✨", "🎈", "💫", "⭐", "🌟", "🎊", "🎉"],
+    balloonColors: [
+      { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
+      { body: "#6BA3BE", shine: "#8ec0d8", string: "#4a7a96" },
+      { body: "#B8A9C9", shine: "#d0c4de", string: "#8a7aa0" },
+      { body: "#F4A261", shine: "#f7bc8a", string: "#c07840" },
+      { body: "#E8A0BF", shine: "#f0bdd4", string: "#b87898" },
+      { body: "#87A878", shine: "#a8c99a", string: "#5a7a52" },
+      { body: "#6BA3BE", shine: "#8ec0d8", string: "#4a7a96" },
+      { body: "#B8A9C9", shine: "#d0c4de", string: "#8a7aa0" },
+      { body: "#F4A261", shine: "#f7bc8a", string: "#c07840" },
+    ],
+    label: "Special Occasion",
+    tagline: "Something magical, just for you ✨",
+    starColors: ["#B8A9C9", "#6BA3BE", "#f0f5ff"],
+  },
+};
 
-// ─── Regular balloon SVG ──────────────────────────────────────────────────────
-function BalloonSVG({ color, size = 90 }: { color: (typeof BALLOON_COLORS)[0]; size?: number }) {
-  const gid = `bg-${color.body.replace("#", "")}`;
+function getTheme(occasion: string) {
+  return THEMES[occasion] ?? THEMES["Other"];
+}
+
+// ─── Balloon SVG ──────────────────────────────────────────────────────────────
+function BalloonSVG({ color, size = 90 }: { color: { body: string; shine: string; string: string }; size?: number }) {
+  const gid = `bg-${color.body.replace("#", "")}-${size}`;
   return (
     <svg width={size} height={size * 1.625} viewBox="0 0 80 130" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -59,7 +329,7 @@ function BalloonSVG({ color, size = 90 }: { color: (typeof BALLOON_COLORS)[0]; s
   );
 }
 
-// ─── Organic cluster positions ────────────────────────────────────────────────
+// ─── Cluster positions ────────────────────────────────────────────────────────
 function getClusterPositions(total: number) {
   const radius = 28;
   const centerX = 50;
@@ -85,15 +355,17 @@ function WelcomeScreen({
   recipientName,
   occasion,
   onStart,
+  theme,
 }: {
   recipientName: string;
   occasion: string;
   onStart: () => void;
+  theme: ReturnType<typeof getTheme>;
 }) {
   return (
     <div className="preview-body">
       <div className="welcome-balloons" aria-hidden="true">
-        {BALLOON_COLORS.slice(0, 7).map((color, i) => (
+        {theme.balloonColors.slice(0, 7).map((color, i) => (
           <div key={i} className={`float-balloon fb-${i}`}>
             <BalloonSVG color={color} size={55 + (i % 3) * 12} />
           </div>
@@ -106,7 +378,7 @@ function WelcomeScreen({
           Hey <span className="name-highlight">{recipientName}</span>!
         </h1>
         <p className="welcome-teaser">
-          Someone special has crafted a magical surprise just for you.
+          {theme.tagline}
           <br />
           Click below to start the magic ✨
         </p>
@@ -151,12 +423,12 @@ function WelcomeScreen({
           100% { transform: translateY(-115vh) rotate(3deg); opacity: 0; }
         }
         .welcome-card {
-          background: rgba(255,255,255,0.78);
+          background: ${theme.cardBg};
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           border: 1.5px solid rgba(255,255,255,0.9);
           border-radius: 28px;
-          box-shadow: 0 12px 48px rgba(107,163,190,0.2), 0 2px 8px rgba(0,0,0,0.06);
+          box-shadow: 0 12px 48px ${theme.accent}33, 0 2px 8px rgba(0,0,0,0.06);
           padding: 3rem 2.5rem 2.75rem;
           width: 100%;
           max-width: 480px;
@@ -174,26 +446,27 @@ function WelcomeScreen({
           font-family: 'Courier New', monospace;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #B8A9C9;
+          color: ${theme.accent};
           margin: 0 0 0.75rem;
+          opacity: 0.85;
         }
         .welcome-name {
           font-size: 2.6rem;
           font-weight: 700;
-          color: #2D2D2D;
+          color: ${theme.text};
           margin: 0 0 1rem;
           line-height: 1.1;
           font-family: 'Georgia', serif;
         }
         .name-highlight {
-          background: linear-gradient(135deg, #87A878, #6BA3BE);
+          background: linear-gradient(135deg, ${theme.accent}, ${theme.accentShine});
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
         }
         .welcome-teaser {
           font-size: 0.95rem;
-          color: #777;
+          color: ${theme.subtext};
           line-height: 1.65;
           font-family: 'Georgia', serif;
           font-style: italic;
@@ -204,7 +477,7 @@ function WelcomeScreen({
           align-items: center;
           gap: 0.5rem;
           padding: 1rem 2.25rem;
-          background: linear-gradient(135deg, #87A878, #6BA3BE);
+          background: linear-gradient(135deg, ${theme.accent}, ${theme.accentShine});
           color: white;
           border: none;
           border-radius: 50px;
@@ -213,18 +486,18 @@ function WelcomeScreen({
           font-family: 'Courier New', monospace;
           letter-spacing: 0.04em;
           cursor: pointer;
-          box-shadow: 0 6px 24px rgba(107,163,190,0.35);
+          box-shadow: 0 6px 24px ${theme.accent}55;
           transition: transform 0.2s, box-shadow 0.2s;
           animation: pulse 2.5s ease-in-out infinite;
         }
         .magic-btn:hover {
           transform: translateY(-3px) scale(1.04);
-          box-shadow: 0 10px 32px rgba(107,163,190,0.45);
+          box-shadow: 0 10px 32px ${theme.accent}70;
           animation: none;
         }
         @keyframes pulse {
-          0%, 100% { box-shadow: 0 6px 24px rgba(107,163,190,0.35); }
-          50%       { box-shadow: 0 6px 32px rgba(135,168,120,0.5); }
+          0%, 100% { box-shadow: 0 6px 24px ${theme.accent}55; }
+          50%       { box-shadow: 0 6px 32px ${theme.accentShine}70; }
         }
         @media (max-width: 520px) {
           .welcome-card { padding: 2.25rem 1.5rem 2rem; }
@@ -239,9 +512,11 @@ function WelcomeScreen({
 function PopScreen({
   balloons,
   onAllPopped,
+  theme,
 }: {
   balloons: Balloon[];
   onAllPopped: () => void;
+  theme: ReturnType<typeof getTheme>;
 }) {
   const [popped, setPopped] = useState<Set<string>>(new Set());
   const [activePolaroid, setActivePolaroid] = useState<ModalContent | null>(null);
@@ -255,7 +530,7 @@ function PopScreen({
     confetti({
       particleCount: 80, spread: 75,
       origin: { x: x / window.innerWidth, y: y / window.innerHeight },
-      colors: ["#87A878", "#6BA3BE", "#B8A9C9", "#F4A261", "#E8A0BF", "#ffffff"],
+      colors: theme.confettiColors,
       ticks: 210, gravity: 0.88, scalar: 1.1,
     });
     setTimeout(() => confetti({
@@ -264,7 +539,7 @@ function PopScreen({
       colors: ["#ffffff", "#fef3c7"],
       ticks: 140, gravity: 1.1, scalar: 0.72, shapes: ["circle"],
     }), 200);
-  }, []);
+  }, [theme]);
 
   function playPopSound() {
     try {
@@ -339,7 +614,7 @@ function PopScreen({
       <div className="pop-arena">
         {balloons.map((balloon, i) => {
           const isPopped = popped.has(balloon.id);
-          const color = BALLOON_COLORS[i % BALLOON_COLORS.length];
+          const color = theme.balloonColors[i % theme.balloonColors.length];
           const base = positions[i] ?? { left: 50, top: 50, scale: 1 };
           const jitterX = (Math.random() - 0.5) * 6;
           const jitterY = (Math.random() - 0.5) * 6;
@@ -373,6 +648,7 @@ function PopScreen({
               ) : (
                 <button
                   className="popped-peek"
+                  style={{ boxShadow: `0 3px 12px rgba(0,0,0,0.13), 0 0 0 3px ${theme.accent}25` }}
                   onClick={() => {
                     const stored = poppedContentRef.current.get(balloon.id);
                     if (stored) setActivePolaroid(stored);
@@ -443,7 +719,7 @@ function PopScreen({
           z-index: 50; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
           border: 1.5px solid rgba(255,255,255,0.95); border-radius: 50px;
           padding: 0.42rem 1.3rem; font-size: 0.8rem; font-family: 'Courier New', monospace;
-          font-weight: 600; color: #2D2D2D; letter-spacing: 0.03em;
+          font-weight: 600; color: ${theme.text}; letter-spacing: 0.03em;
           box-shadow: 0 4px 16px rgba(0,0,0,0.09); white-space: nowrap;
           animation: slideDown 0.45s cubic-bezier(0.22,1,0.36,1) both;
         }
@@ -490,7 +766,6 @@ function PopScreen({
           border: 1.5px solid rgba(255,255,255,0.95); border-radius: 50%;
           width: 46px; height: 46px; font-size: 1.35rem; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 3px 12px rgba(0,0,0,0.13), 0 0 0 3px rgba(107,163,190,0.15);
           transition: transform 0.15s, box-shadow 0.15s;
           animation: peekIn 0.3s cubic-bezier(0.22,1,0.36,1) both;
         }
@@ -498,10 +773,7 @@ function PopScreen({
           from { opacity: 0; transform: scale(0.5); }
           to   { opacity: 1; transform: scale(1); }
         }
-        .popped-peek:hover {
-          transform: scale(1.22);
-          box-shadow: 0 6px 20px rgba(107,163,190,0.3), 0 0 0 3px rgba(107,163,190,0.3);
-        }
+        .popped-peek:hover { transform: scale(1.22); }
         .polaroid-overlay {
           position: fixed; inset: 0; z-index: 300;
           background: rgba(15,12,8,0.55); backdrop-filter: blur(6px);
@@ -519,7 +791,7 @@ function PopScreen({
         }
         @keyframes polaroidPop {
           from { opacity: 0; transform: scale(0.6) translateY(40px); }
-          to   { opacity: 1; transform: scale(1)   translateY(0); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
         }
         .polaroid-photo { width: 100%; aspect-ratio: 1/1; border-radius: 2px; overflow: hidden; position: relative; background: #f0ece4; }
         .polaroid-img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -570,11 +842,13 @@ function FinalMessageScreen({
   finalMessage,
   recipientName,
   occasion,
+  theme,
   onFinalize,
 }: {
   finalMessage: string;
   recipientName: string;
   occasion: string;
+  theme: ReturnType<typeof getTheme>;
   onFinalize: () => void;
 }) {
   return (
@@ -590,6 +864,7 @@ function FinalMessageScreen({
               animationDelay: `${-(i * 0.38)}s`,
               fontSize: `${0.6 + (i % 4) * 0.22}rem`,
               opacity: 0.6 + (i % 3) * 0.15,
+              color: theme.starColors[i % theme.starColors.length],
             }}
           >
             {["✦", "✧", "⭐", "✨", "★"][i % 5]}
@@ -629,7 +904,7 @@ function FinalMessageScreen({
         </div>
 
         <div className="fs-balloon-row" aria-hidden="true">
-          {BALLOON_COLORS.slice(0, 5).map((color, i) => (
+          {theme.balloonColors.slice(0, 5).map((color, i) => (
             <div key={i} className="fs-balloon" style={{ animationDuration: `${2.8 + i * 0.4}s`, animationDelay: `${-(i * 0.6)}s` }}>
               <BalloonSVG color={color} size={42} />
             </div>
@@ -640,7 +915,7 @@ function FinalMessageScreen({
       <style jsx>{`
         .final-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 5rem 1.25rem 3rem; position: relative; overflow: hidden; }
         .stars-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-        .falling-star { position: absolute; top: -2rem; animation: starFall linear infinite; color: #F4C430; text-shadow: 0 0 6px rgba(244,196,48,0.6); }
+        .falling-star { position: absolute; top: -2rem; animation: starFall linear infinite; text-shadow: 0 0 6px currentColor; }
         @keyframes starFall {
           0%   { transform: translateY(-40px) rotate(0deg);   opacity: 0; }
           8%   { opacity: 1; }
@@ -653,32 +928,32 @@ function FinalMessageScreen({
         .fs-emoji-row { display: flex; justify-content: center; gap: 0.35rem; margin-bottom: 0.65rem; }
         .bounce-emoji { display: inline-block; font-size: 2rem; animation: emojiBounce 1.6s ease-in-out infinite; }
         @keyframes emojiBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .fs-occasion-tag { font-family: 'Courier New', monospace; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: #B8A9C9; margin: 0 0 0.5rem; }
-        .fs-headline { font-family: 'Georgia', serif; font-size: 2rem; font-weight: 700; color: #2D2D2D; margin: 0; line-height: 1.2; }
-        .fs-name { background: linear-gradient(135deg, #87A878, #6BA3BE); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .fs-occasion-tag { font-family: 'Courier New', monospace; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: ${theme.accent}; margin: 0 0 0.5rem; opacity: 0.85; }
+        .fs-headline { font-family: 'Georgia', serif; font-size: 2rem; font-weight: 700; color: ${theme.text}; margin: 0; line-height: 1.2; }
+        .fs-name { background: linear-gradient(135deg, ${theme.accent}, ${theme.accentShine}); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .fs-message-card {
-          width: 100%; background: rgba(255,255,255,0.88); backdrop-filter: blur(24px);
+          width: 100%; background: ${theme.cardBg}; backdrop-filter: blur(24px);
           border: 1.5px solid rgba(255,255,255,0.95); border-radius: 28px;
           padding: 2.5rem 2.25rem 2.25rem; text-align: center; position: relative;
-          box-shadow: 0 16px 48px rgba(107,163,190,0.18), 0 4px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+          box-shadow: 0 16px 48px ${theme.accent}28, 0 4px 12px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
           animation: cardReveal 0.8s cubic-bezier(0.22,1,0.36,1) 0.15s both; overflow: hidden;
         }
         @keyframes cardReveal { from { opacity: 0; transform: translateY(32px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .fs-message-card::before {
           content: ''; position: absolute; inset: 0; border-radius: 28px;
-          background: radial-gradient(ellipse at 15% 15%, rgba(135,168,120,0.07) 0%, transparent 55%), radial-gradient(ellipse at 85% 80%, rgba(184,169,201,0.07) 0%, transparent 55%);
+          background: radial-gradient(ellipse at 15% 15%, ${theme.accent}12 0%, transparent 55%), radial-gradient(ellipse at 85% 80%, ${theme.accentShine}12 0%, transparent 55%);
           pointer-events: none;
         }
-        .corner-ornament { position: absolute; font-size: 0.7rem; color: rgba(107,163,190,0.35); line-height: 1; }
+        .corner-ornament { position: absolute; font-size: 0.7rem; color: ${theme.accent}55; line-height: 1; }
         .tl { top: 14px; left: 16px; } .tr { top: 14px; right: 16px; } .bl { bottom: 14px; left: 16px; } .br { bottom: 14px; right: 16px; }
-        .fs-quote-icon { font-size: 2.6rem; margin-bottom: 1rem; animation: iconFloat 2.4s ease-in-out infinite; filter: drop-shadow(0 4px 10px rgba(107,163,190,0.25)); }
+        .fs-quote-icon { font-size: 2.6rem; margin-bottom: 1rem; animation: iconFloat 2.4s ease-in-out infinite; filter: drop-shadow(0 4px 10px ${theme.accent}40); }
         @keyframes iconFloat { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-6px) rotate(3deg); } }
         .fs-divider { display: flex; align-items: center; gap: 0.6rem; margin: 0 auto 1.35rem; max-width: 180px; }
-        .fs-divider span:not(.fs-divider-star) { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(107,163,190,0.3), transparent); }
-        .fs-divider-star { color: #87A878; font-size: 0.6rem; }
+        .fs-divider span:not(.fs-divider-star) { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, ${theme.accent}50, transparent); }
+        .fs-divider-star { color: ${theme.accent}; font-size: 0.6rem; }
         .fs-divider-bottom { margin-top: 1.35rem; margin-bottom: 1rem; }
-        .fs-message-text { font-family: 'Georgia', serif; font-size: 1.08rem; line-height: 1.85; color: #3a3630; font-style: italic; margin: 0; position: relative; padding: 0 0.5rem; }
-        .fs-sign-off { font-family: 'Courier New', monospace; font-size: 0.72rem; letter-spacing: 0.1em; color: #B8A9C9; margin: 0; text-transform: uppercase; }
+        .fs-message-text { font-family: 'Georgia', serif; font-size: 1.08rem; line-height: 1.85; color: ${theme.text}; font-style: italic; margin: 0; position: relative; padding: 0 0.5rem; }
+        .fs-sign-off { font-family: 'Courier New', monospace; font-size: 0.72rem; letter-spacing: 0.1em; color: ${theme.accent}; margin: 0; text-transform: uppercase; opacity: 0.75; }
         .fs-balloon-row { display: flex; justify-content: center; gap: 0.5rem; animation: balloonRowIn 0.9s cubic-bezier(0.22,1,0.36,1) 0.35s both; }
         @keyframes balloonRowIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         .fs-balloon { animation: miniBob ease-in-out infinite; }
@@ -694,10 +969,11 @@ function FinalMessageScreen({
   );
 }
 
-// ─── Finalize Modal — NOW WITH RAZORPAY ──────────────────────────────────────
+// ─── Finalize Modal — WITH RAZORPAY (unchanged) ───────────────────────────────
 function FinalizeModal({
   onClose,
   onPaymentSuccess,
+  theme,
 }: {
   onClose: () => void;
   onPaymentSuccess: (paymentData: {
@@ -705,6 +981,7 @@ function FinalizeModal({
     razorpay_payment_id: string;
     razorpay_signature: string;
   }) => void;
+  theme: ReturnType<typeof getTheme>;
 }) {
   const [coupon, setCoupon] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
@@ -727,31 +1004,22 @@ function FinalizeModal({
     setPayError("");
 
     try {
-      // Step 1 — Create a Razorpay order on our server
       const orderRes = await fetch("/api/create-razorpay-order", { method: "POST" });
       if (!orderRes.ok) throw new Error("Could not create payment order. Please try again.");
       const { orderId, amount, currency } = await orderRes.json();
 
-      // Step 2 — Load Razorpay checkout script dynamically (if not already loaded)
       await loadRazorpayScript();
 
-      // Step 3 — Open Razorpay checkout popup
       const options: RazorpayOptions = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-        amount,          // in paise — passed from server so we never trust client
+        amount,
         currency,
         name: "SurpriseGift",
         description: "Balloon Surprise Package",
         order_id: orderId,
-        theme: { color: "#87A878" },
-        method: {
-          upi: true,
-          card: true,
-          netbanking: true,
-          wallet: true,
-        },
+        theme: { color: theme.accent },
+        method: { upi: true, card: true, netbanking: true, wallet: true },
         handler: async (response) => {
-          // Step 4 — Payment succeeded; call our finalize route
           onPaymentSuccess({
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
@@ -759,26 +1027,17 @@ function FinalizeModal({
           });
         },
         modal: {
-          ondismiss: () => {
-            // User closed the Razorpay popup without paying
-            setIsLoading(false);
-          },
+          ondismiss: () => { setIsLoading(false); },
         },
-        prefill: {
-          // These can be pre-filled if you have the creator's email from Supabase session
-          email: "",
-          contact: "",
-        },
+        prefill: { email: "", contact: "" },
       };
 
-      // @ts-ignore — Razorpay is loaded via script tag, not typed
+      // @ts-ignore
       const rzp = new window.Razorpay(options);
-
       rzp.on("payment.failed", (response: { error: { description: string } }) => {
         setPayError(response.error.description || "Payment failed. Please try again.");
         setIsLoading(false);
       });
-
       rzp.open();
     } catch (err) {
       setPayError(err instanceof Error ? err.message : "Something went wrong.");
@@ -789,14 +1048,12 @@ function FinalizeModal({
   return (
     <div className="finalize-overlay" onClick={isLoading ? undefined : onClose}>
       <div className="finalize-modal" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
         <div className="fm-header">
           <div className="fm-icon">🎁</div>
           <h2 className="fm-title">Finalize Your Surprise</h2>
           <p className="fm-subtitle">You're one step away from sending magic ✨</p>
         </div>
 
-        {/* Price */}
         <div className="fm-price-block">
           <div className="fm-price-row">
             <span className="fm-price-label">Surprise Package</span>
@@ -813,7 +1070,6 @@ function FinalizeModal({
           </div>
         </div>
 
-        {/* Coupon */}
         <div className="fm-coupon-section">
           <p className="fm-coupon-label">Have a coupon code?</p>
           <div className="fm-coupon-row">
@@ -837,39 +1093,23 @@ function FinalizeModal({
           {couponApplied && <p className="fm-coupon-msg fm-coupon-success">✓ Coupon applied!</p>}
         </div>
 
-        {/* Payment error */}
         {payError && (
-          <div className="fm-pay-error">
-            ⚠ {payError}
-          </div>
+          <div className="fm-pay-error">⚠ {payError}</div>
         )}
 
         <div className="fm-divider">
           <span /><span className="fm-divider-dot">✦</span><span />
         </div>
 
-        {/* Actions */}
         <div className="fm-actions">
-          <button
-            className="fm-confirm-btn"
-            onClick={handlePayNow}
-            disabled={isLoading}
-          >
+          <button className="fm-confirm-btn" onClick={handlePayNow} disabled={isLoading}>
             {isLoading ? (
-              <>
-                <span className="fm-spinner" />
-                Opening Payment…
-              </>
+              <><span className="fm-spinner" />Opening Payment…</>
             ) : (
-              <>
-                <span className="fm-confirm-icon">✨</span>
-                Yes, Finalize &amp; Pay
-              </>
+              <><span className="fm-confirm-icon">✨</span>Yes, Finalize &amp; Pay</>
             )}
           </button>
-          <button className="fm-cancel-btn" onClick={onClose} disabled={isLoading}>
-            Cancel
-          </button>
+          <button className="fm-cancel-btn" onClick={onClose} disabled={isLoading}>Cancel</button>
         </div>
 
         <p className="fm-trust">🔒 Powered by Razorpay · Secure payment · No hidden charges</p>
@@ -889,95 +1129,85 @@ function FinalizeModal({
         @keyframes fOverlayIn { from { opacity: 0; } to { opacity: 1; } }
         .finalize-modal {
           position: relative; cursor: default; width: 100%; max-width: 400px;
-          background: #faf3e0; border-radius: 28px; padding: 2.25rem 2rem 2rem;
-          box-shadow: 0 0 0 1.5px rgba(135,168,120,0.25), 0 24px 72px rgba(45,45,45,0.28), inset 0 1px 0 rgba(255,255,255,0.9);
+          background: ${theme.cardBg}; border-radius: 28px; padding: 2.25rem 2rem 2rem;
+          box-shadow: 0 0 0 1.5px ${theme.accent}40, 0 24px 72px rgba(45,45,45,0.28), inset 0 1px 0 rgba(255,255,255,0.9);
           animation: fModalIn 0.4s cubic-bezier(0.22,1,0.36,1) both; overflow: hidden;
         }
         @keyframes fModalIn { from { opacity: 0; transform: scale(0.88) translateY(24px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         .finalize-modal::before {
           content: ''; position: absolute; inset: 0; border-radius: 28px;
-          background: radial-gradient(circle at 15% 10%, rgba(135,168,120,0.08) 0%, transparent 50%), radial-gradient(circle at 85% 88%, rgba(107,163,190,0.07) 0%, transparent 50%);
+          background: radial-gradient(circle at 15% 10%, ${theme.accent}14 0%, transparent 50%), radial-gradient(circle at 85% 88%, ${theme.accentShine}12 0%, transparent 50%);
           pointer-events: none;
         }
         .fm-header { text-align: center; margin-bottom: 1.5rem; }
-        .fm-icon { font-size: 2.8rem; margin-bottom: 0.6rem; display: block; animation: giftBounce 2s ease-in-out infinite; filter: drop-shadow(0 4px 8px rgba(135,168,120,0.3)); }
+        .fm-icon { font-size: 2.8rem; margin-bottom: 0.6rem; display: block; animation: giftBounce 2s ease-in-out infinite; filter: drop-shadow(0 4px 8px ${theme.accent}50); }
         @keyframes giftBounce { 0%, 100% { transform: rotate(-4deg) scale(1); } 50% { transform: rotate(4deg) scale(1.08); } }
-        .fm-title { font-family: 'Georgia', serif; font-size: 1.45rem; font-weight: 700; color: #2D2D2D; margin: 0 0 0.3rem; }
-        .fm-subtitle { font-family: 'Courier New', monospace; font-size: 0.72rem; color: #B8A9C9; letter-spacing: 0.06em; margin: 0; }
-        .fm-price-block { background: rgba(255,255,255,0.7); border: 1.5px solid rgba(135,168,120,0.2); border-radius: 16px; padding: 1.1rem 1.25rem; margin-bottom: 1.25rem; }
+        .fm-title { font-family: 'Georgia', serif; font-size: 1.45rem; font-weight: 700; color: ${theme.text}; margin: 0 0 0.3rem; }
+        .fm-subtitle { font-family: 'Courier New', monospace; font-size: 0.72rem; color: ${theme.accent}; letter-spacing: 0.06em; margin: 0; opacity: 0.8; }
+        .fm-price-block { background: rgba(255,255,255,0.7); border: 1.5px solid ${theme.accent}30; border-radius: 16px; padding: 1.1rem 1.25rem; margin-bottom: 1.25rem; }
         .fm-price-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
-        .fm-price-label { font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: 600; color: #2D2D2D; letter-spacing: 0.04em; }
+        .fm-price-label { font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: 600; color: ${theme.text}; letter-spacing: 0.04em; }
         .fm-price-values { display: flex; align-items: baseline; gap: 0.35rem; }
-        .fm-price-inr { font-family: 'Georgia', serif; font-size: 1.6rem; font-weight: 700; color: #87A878; line-height: 1; }
+        .fm-price-inr { font-family: 'Georgia', serif; font-size: 1.6rem; font-weight: 700; color: ${theme.accent}; line-height: 1; }
         .fm-price-sep { color: #ccc; font-size: 0.8rem; }
         .fm-price-usd { font-family: 'Courier New', monospace; font-size: 0.85rem; color: #aaa; }
         .fm-price-features { display: flex; flex-direction: column; gap: 0.22rem; }
-        .fm-feature { font-family: 'Courier New', monospace; font-size: 0.72rem; color: #6BA3BE; letter-spacing: 0.03em; }
+        .fm-feature { font-family: 'Courier New', monospace; font-size: 0.72rem; color: ${theme.accent}; letter-spacing: 0.03em; opacity: 0.85; }
         .fm-coupon-section { margin-bottom: 1rem; }
         .fm-coupon-label { font-family: 'Courier New', monospace; font-size: 0.72rem; color: #888; letter-spacing: 0.05em; margin: 0 0 0.5rem; }
         .fm-coupon-row { display: flex; gap: 0.5rem; }
         .fm-coupon-input {
           flex: 1; padding: 0.6rem 0.9rem; background: rgba(255,255,255,0.85);
-          border: 1.5px solid rgba(135,168,120,0.25); border-radius: 10px;
+          border: 1.5px solid ${theme.accent}35; border-radius: 10px;
           font-family: 'Courier New', monospace; font-size: 0.82rem; font-weight: 600;
-          color: #2D2D2D; letter-spacing: 0.08em; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+          color: ${theme.text}; letter-spacing: 0.08em; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
         }
         .fm-coupon-input::placeholder { color: #ccc; font-weight: 400; letter-spacing: 0; }
-        .fm-coupon-input:focus { border-color: #87A878; box-shadow: 0 0 0 3px rgba(135,168,120,0.15); }
+        .fm-coupon-input:focus { border-color: ${theme.accent}; box-shadow: 0 0 0 3px ${theme.accent}20; }
         .fm-coupon-input.error { border-color: #e57373; }
-        .fm-coupon-input.success { border-color: #87A878; }
+        .fm-coupon-input.success { border-color: ${theme.accent}; }
         .fm-coupon-input:disabled { opacity: 0.6; cursor: not-allowed; }
         .fm-apply-btn {
-          padding: 0.6rem 1.1rem; background: linear-gradient(135deg, #87A878, #6BA3BE);
+          padding: 0.6rem 1.1rem; background: linear-gradient(135deg, ${theme.accent}, ${theme.accentShine});
           color: white; border: none; border-radius: 10px;
           font-family: 'Courier New', monospace; font-size: 0.78rem; font-weight: 700;
           cursor: pointer; letter-spacing: 0.04em; white-space: nowrap;
-          transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 3px 10px rgba(107,163,190,0.3);
+          transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 3px 10px ${theme.accent}40;
         }
-        .fm-apply-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(107,163,190,0.4); }
+        .fm-apply-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 14px ${theme.accent}55; }
         .fm-apply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .fm-coupon-msg { font-family: 'Courier New', monospace; font-size: 0.7rem; margin: 0.4rem 0 0; letter-spacing: 0.04em; }
         .fm-coupon-error   { color: #e57373; }
-        .fm-coupon-success { color: #87A878; }
-        /* Payment error */
+        .fm-coupon-success { color: ${theme.accent}; }
         .fm-pay-error {
           background: rgba(229,115,115,0.1); border: 1px solid rgba(229,115,115,0.3);
           border-radius: 10px; padding: 0.65rem 0.9rem; margin-bottom: 1rem;
           font-family: 'Courier New', monospace; font-size: 0.72rem; color: #c62828; letter-spacing: 0.03em;
         }
         .fm-divider { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; }
-        .fm-divider span:not(.fm-divider-dot) { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(135,168,120,0.25), transparent); }
-        .fm-divider-dot { color: #B8A9C9; font-size: 0.55rem; }
+        .fm-divider span:not(.fm-divider-dot) { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, ${theme.accent}35, transparent); }
+        .fm-divider-dot { color: ${theme.accent}; font-size: 0.55rem; opacity: 0.7; }
         .fm-actions { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 0.85rem; }
         .fm-confirm-btn {
           display: flex; align-items: center; justify-content: center; gap: 0.5rem;
           padding: 0.9rem 1.5rem;
-          background: linear-gradient(135deg, #87A878 0%, #6BA3BE 100%);
+          background: linear-gradient(135deg, ${theme.accent} 0%, ${theme.accentShine} 100%);
           color: white; border: none; border-radius: 14px;
           font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 700;
           letter-spacing: 0.04em; cursor: pointer;
-          box-shadow: 0 6px 20px rgba(107,163,190,0.38), inset 0 1px 0 rgba(255,255,255,0.2);
+          box-shadow: 0 6px 20px ${theme.accent}55, inset 0 1px 0 rgba(255,255,255,0.2);
           transition: transform 0.18s, box-shadow 0.18s;
           animation: confirmPulse 2.6s ease-in-out infinite;
         }
-        .fm-confirm-btn:hover:not(:disabled) {
-          transform: translateY(-2px) scale(1.02);
-          box-shadow: 0 10px 28px rgba(107,163,190,0.48);
-          animation: none;
-        }
+        .fm-confirm-btn:hover:not(:disabled) { transform: translateY(-2px) scale(1.02); box-shadow: 0 10px 28px ${theme.accent}70; animation: none; }
         .fm-confirm-btn:disabled { opacity: 0.8; cursor: not-allowed; animation: none; }
         @keyframes confirmPulse {
-          0%, 100% { box-shadow: 0 6px 20px rgba(107,163,190,0.38), inset 0 1px 0 rgba(255,255,255,0.2); }
-          50%       { box-shadow: 0 6px 28px rgba(135,168,120,0.5),  inset 0 1px 0 rgba(255,255,255,0.2); }
+          0%, 100% { box-shadow: 0 6px 20px ${theme.accent}55, inset 0 1px 0 rgba(255,255,255,0.2); }
+          50%       { box-shadow: 0 6px 28px ${theme.accentShine}70, inset 0 1px 0 rgba(255,255,255,0.2); }
         }
         .fm-confirm-icon { font-size: 1.05rem; animation: sparkSpin 3s linear infinite; }
         @keyframes sparkSpin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
-        /* Loading spinner inside button */
-        .fm-spinner {
-          width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
-          border-top-color: white; border-radius: 50%;
-          animation: spin 0.7s linear infinite; flex-shrink: 0;
-        }
+        .fm-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .fm-cancel-btn {
           padding: 0.75rem; background: transparent;
@@ -1009,7 +1239,6 @@ function FinalizeModal({
 // ─── Helper: load Razorpay script once ───────────────────────────────────────
 function loadRazorpayScript(): Promise<void> {
   return new Promise((resolve, reject) => {
-    // Already loaded
     if (typeof window !== "undefined" && (window as any).Razorpay) {
       resolve();
       return;
@@ -1032,17 +1261,8 @@ interface RazorpayOptions {
   description: string;
   order_id: string;
   theme: { color: string };
-  method?: {
-    upi?: boolean;
-    card?: boolean;
-    netbanking?: boolean;
-    wallet?: boolean;
-  };
-  handler: (response: {
-    razorpay_payment_id: string;
-    razorpay_order_id: string;
-    razorpay_signature: string;
-  }) => void;
+  method?: { upi?: boolean; card?: boolean; netbanking?: boolean; wallet?: boolean; };
+  handler: (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string; }) => void;
   modal: { ondismiss: () => void };
   prefill?: { email?: string; contact?: string };
 }
@@ -1060,46 +1280,46 @@ export default function Step4Preview({
   const [isFinalizingPayment, setIsFinalizingPayment] = useState(false);
   const [finalizeError, setFinalizeError] = useState("");
 
+  const theme = getTheme(occasion);
   const allBalloonsPopped = screen === "final";
 
   // Called by FinalizeModal after Razorpay confirms payment on client
   async function handlePaymentSuccess(paymentData: {
-  razorpay_order_id: string;
-  razorpay_payment_id: string;
-  razorpay_signature: string;
-}) {
-  setShowFinalizeModal(false);
-  setIsFinalizingPayment(true);
-  setFinalizeError("");
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }) {
+    setShowFinalizeModal(false);
+    setIsFinalizingPayment(true);
+    setFinalizeError("");
 
-  try {
-    const res = await fetch("/api/finalize-surprise", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...paymentData,
-        recipientName,
-        occasion,
-        finalMessage,
-        balloons,
-      }),
-    });
+    try {
+      const res = await fetch("/api/finalize-surprise", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...paymentData,
+          recipientName,
+          occasion,
+          finalMessage,
+          balloons,
+        }),
+      });
 
-    if (!res.ok) {
-      const errData = await res.json();
-      throw new Error(errData.error || "Finalize failed. Please contact support.");
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Finalize failed. Please contact support.");
+      }
+
+      const data = await res.json();
+      window.location.href = `/dashboard/success?slug=${data.slug}`;
+    } catch (err) {
+      setFinalizeError(
+        err instanceof Error ? err.message : "Something went wrong finalizing your surprise."
+      );
+      setIsFinalizingPayment(false);
     }
-
-    const data = await res.json();
-    window.location.href = `/dashboard/success?slug=${data.slug}`;
-
-  } catch (err) {
-    setFinalizeError(
-      err instanceof Error ? err.message : "Something went wrong finalizing your surprise."
-    );
-    setIsFinalizingPayment(false);
   }
-}
 
   return (
     <div className="preview-root">
@@ -1128,6 +1348,7 @@ export default function Step4Preview({
           recipientName={recipientName}
           occasion={occasion}
           onStart={() => setScreen("pop")}
+          theme={theme}
         />
       )}
 
@@ -1135,6 +1356,7 @@ export default function Step4Preview({
         <PopScreen
           balloons={balloons}
           onAllPopped={() => setScreen("final")}
+          theme={theme}
         />
       )}
 
@@ -1143,19 +1365,20 @@ export default function Step4Preview({
           finalMessage={finalMessage}
           recipientName={recipientName}
           occasion={occasion}
+          theme={theme}
           onFinalize={() => setShowFinalizeModal(true)}
         />
       )}
 
       {screen === "final" && (
         <div className="replay-bar">
-          <button className="replay-link" onClick={() => setScreen("welcome")}>
+          <button className="replay-link" style={{ color: theme.accent, borderColor: theme.border }} onClick={() => setScreen("welcome")}>
             ↺ Replay Preview
           </button>
         </div>
       )}
 
-      {/* Finalize error (shown if server call after payment fails) */}
+      {/* Finalize error */}
       {finalizeError && (
         <div className="global-error">
           ⚠ {finalizeError}
@@ -1163,17 +1386,18 @@ export default function Step4Preview({
         </div>
       )}
 
-      {/* ── Finalize Modal (with Razorpay) ── */}
+      {/* ── Finalize Modal ── */}
       {showFinalizeModal && (
         <FinalizeModal
           onClose={() => setShowFinalizeModal(false)}
           onPaymentSuccess={handlePaymentSuccess}
+          theme={theme}
         />
       )}
 
       <style jsx>{`
         .preview-root { min-height: 100vh; font-family: 'Georgia', 'Times New Roman', serif; position: relative; }
-        .preview-bg { position: fixed; inset: 0; background: linear-gradient(135deg, #faf3e0 0%, #e8f4f0 50%, #e8eef6 100%); z-index: -1; }
+        .preview-bg { position: fixed; inset: 0; background: ${theme.gradient}; z-index: -1; }
         .preview-banner {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #1a1a1a;
@@ -1205,13 +1429,12 @@ export default function Step4Preview({
         .replay-bar { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 10; }
         .replay-link {
           background: rgba(255,255,255,0.75); backdrop-filter: blur(10px);
-          border: 1.5px solid rgba(135,168,120,0.25); border-radius: 50px;
+          border: 1.5px solid; border-radius: 50px;
           padding: 0.45rem 1.25rem; font-family: 'Courier New', monospace; font-size: 0.72rem;
-          font-weight: 600; color: #87A878; cursor: pointer; letter-spacing: 0.04em;
-          transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 3px 12px rgba(135,168,120,0.15);
+          font-weight: 600; cursor: pointer; letter-spacing: 0.04em;
+          transition: transform 0.15s, box-shadow 0.15s;
         }
-        .replay-link:hover { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(135,168,120,0.25); }
-        /* Global error toast */
+        .replay-link:hover { transform: translateY(-2px); }
         .global-error {
           position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%);
           z-index: 200; background: #fff; border: 1.5px solid #e57373; border-radius: 12px;
