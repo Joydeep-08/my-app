@@ -1,4 +1,5 @@
 "use client";
+
 export default function Home() {
   return (
     <main
@@ -21,10 +22,34 @@ export default function Home() {
           alignItems: "center",
         }}
       >
-        <h1 style={{ fontSize: "20px", fontWeight: 600 }}>
-          🎁 Create My Surprise
-        </h1>
+        {/* BRAND */}
+        <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+  <span
+    style={{
+      fontSize: "22px",
+      fontWeight: 700,
+      letterSpacing: "-0.4px",
+      background: "linear-gradient(90deg, #22c55e, #4ade80)",
+      WebkitBackgroundClip: "text",
+      color: "transparent",
+    }}
+  >
+    ✨ Lumina
+  </span>
 
+  <span
+    style={{
+      fontSize: "13px",
+      color: "#9ca3af",
+      fontWeight: 500,
+      letterSpacing: "0.2px",
+    }}
+  >
+    · Brightening lives
+  </span>
+</div>
+
+        {/* LOGIN */}
         <a
           href="/login"
           style={{
@@ -139,16 +164,7 @@ export default function Home() {
                 "0 15px 40px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(255,255,255,0.4)",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-6px)";
-              e.currentTarget.style.boxShadow =
-                "0 25px 60px rgba(0,0,0,0.12)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow =
-                "0 15px 40px rgba(0,0,0,0.08)";
-            }}
+            className="feature-card"
           >
             <h3 style={{ fontSize: "18px", fontWeight: 600 }}>
               {item.title}
@@ -199,6 +215,16 @@ export default function Home() {
           Start Creating →
         </a>
       </div>
+
+      {/* HOVER FIX (no JS needed) */}
+      <style>
+        {`
+          .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+          }
+        `}
+      </style>
     </main>
   );
 }
