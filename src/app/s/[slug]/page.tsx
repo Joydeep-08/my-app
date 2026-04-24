@@ -1046,21 +1046,22 @@ function BgMusic({ occasion }: { occasion: string }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    if (!videoId) return;
+  if (!videoId) return;
 
-    // Load YouTube IFrame API
-    if (!(window as any).YT) {
-      const tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      document.head.appendChild(tag);
-    }
+  if (!(window as any).YT) {
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+  }
 
-    const initPlayer = () => {
-      if (!(window as any).YT?.Player) return;
-      playerRef.current = new (window as any).YT.Player(`yt-bg-player-${occasion.replace(/\s/g, "")}`, {
+  const initPlayer = () => {
+    if (!(window as any).YT?.Player) return;
+    playerRef.current = new (window as any).YT.Player(
+      `yt-bg-player-${occasion.replace(/\s/g, "")}`,
+      {
         videoId,
         playerVars: {
-          autoplay: 1,
+          autoplay: 0, // 👈 don't autoplay, we trigger manually
           loop: 1,
           playlist: videoId,
           controls: 0,
@@ -1072,23 +1073,31 @@ function BgMusic({ occasion }: { occasion: string }) {
         events: {
           onReady: (e: any) => {
             e.target.setVolume(60);
-            e.target.playVideo();
             setReady(true);
+            // Play on first user interaction
+            const startMusic = () => {
+              e.target.playVideo();
+              window.removeEventListener("click", startMusic);
+              window.removeEventListener("touchstart", startMusic);
+            };
+            window.addEventListener("click", startMusic);
+            window.addEventListener("touchstart", startMusic);
           },
         },
-      });
-    };
+      }
+    );
+  };
 
-    if ((window as any).YT?.Player) {
-      initPlayer();
-    } else {
-      (window as any).onYouTubeIframeAPIReady = initPlayer;
-    }
+  if ((window as any).YT?.Player) {
+    initPlayer();
+  } else {
+    (window as any).onYouTubeIframeAPIReady = initPlayer;
+  }
 
-    return () => {
-      playerRef.current?.destroy?.();
-    };
-  }, [videoId]);
+  return () => {
+    playerRef.current?.destroy?.();
+  };
+}, [videoId]);
 
   function toggleMute() {
     if (!playerRef.current) return;
