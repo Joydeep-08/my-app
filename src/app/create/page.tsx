@@ -94,23 +94,23 @@ function CropModal({
 
         <div className="crop-viewport">
           <Cropper
-            image={imageSrc}
-            crop={crop}
-            zoom={zoom}
-            
-            onCropChange={setCrop}
-            onZoomChange={setZoom}
-            onCropComplete={onCropComplete}
-            cropShape="rect"
-            showGrid={true}
-            style={{
-              containerStyle: { borderRadius: "8px" },
-              cropAreaStyle: {
-                border: "2px solid rgba(135,168,120,0.9)",
-                boxShadow: "0 0 0 9999px rgba(0,0,0,0.55)",
-              },
-            }}
-          />
+  image={imageSrc}
+  crop={crop}
+  zoom={zoom}
+  aspect={4/5}
+  onCropChange={setCrop}
+  onZoomChange={setZoom}
+  onCropComplete={onCropComplete}
+  cropShape="rect"
+  showGrid={true}
+  style={{
+    containerStyle: { borderRadius: "8px" },
+    cropAreaStyle: {
+      border: "2px solid rgba(135,168,120,0.9)",
+      boxShadow: "0 0 0 9999px rgba(0,0,0,0.55)",
+    },
+  }}
+/>
         </div>
 
         {/* Zoom slider */}
