@@ -44,48 +44,18 @@ async function getCroppedBase64(imageSrc: string, pixelCrop: CropArea): Promise<
     img.addEventListener("error", reject);
     img.src = imageSrc;
   });
-
-  // Fix output size to 800x800 — reduces file size dramatically
   const canvas = document.createElement("canvas");
-  canvas.width = 800;
-  canvas.height = 800;
+  canvas.width = pixelCrop.width;
+  canvas.height = pixelCrop.height;
   const ctx = canvas.getContext("2d")!;
-
-  // Step 1: Draw the cropped image scaled to 800x800
   ctx.drawImage(
     image,
     pixelCrop.x, pixelCrop.y,
     pixelCrop.width, pixelCrop.height,
     0, 0,
-    800, 800
+    pixelCrop.width, pixelCrop.height
   );
-
-  // Step 2: Warm yellow-orange tint (old digicam white balance)
-  ctx.globalCompositeOperation = "multiply";
-  ctx.fillStyle = "rgba(255, 215, 140, 0.16)";
-  ctx.fillRect(0, 0, 800, 800);
-
-  // Step 3: Vignette — dark edges like a cheap lens
-  ctx.globalCompositeOperation = "source-over";
-  const vignette = ctx.createRadialGradient(400, 400, 180, 400, 400, 580);
-  vignette.addColorStop(0, "rgba(0,0,0,0)");
-  vignette.addColorStop(1, "rgba(0,0,0,0.32)");
-  ctx.fillStyle = vignette;
-  ctx.fillRect(0, 0, 800, 800);
-
-  // Step 4: Grain — old sensor noise
-  const imageData = ctx.getImageData(0, 0, 800, 800);
-  const data = imageData.data;
-  for (let i = 0; i < data.length; i += 4) {
-    const grain = (Math.random() - 0.5) * 28;
-    data[i]     = Math.min(255, Math.max(0, data[i]     + grain));
-    data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + grain));
-    data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + grain));
-  }
-  ctx.putImageData(imageData, 0, 0);
-
-  // Step 5: Export — jpeg 0.72 gives digicam compression artifacts + ~150-250KB
-  return canvas.toDataURL("image/jpeg", 0.72);
+  return canvas.toDataURL("image/jpeg", 0.92);
 }
 
 // ─── Crop Modal ───────────────────────────────────────────────────────────────
@@ -127,7 +97,7 @@ function CropModal({
             image={imageSrc}
             crop={crop}
             zoom={zoom}
-            aspect={1}
+            
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onCropComplete}
@@ -746,20 +716,34 @@ function Step2({
 
         /* ── Polaroid card ── */
         .polaroid-card {
-          background: #fff;
-          border-radius: 4px;
-          padding: 0.75rem 0.75rem 1rem;
-          box-shadow:
-            0 4px 16px rgba(0,0,0,0.10),
-            0 1px 4px rgba(0,0,0,0.07),
-            2px 3px 0 rgba(0,0,0,0.04);
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          gap: 0.6rem;
-          animation: cardPopIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-          transition: box-shadow 0.2s, transform 0.2s;
-        }
+  background: #fff;
+  border-radius: 4px;
+  padding: 0.75rem 0.75rem 0.6rem;
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.10),
+    0 1px 4px rgba(0,0,0,0.07),
+    2px 3px 0 rgba(0,0,0,0.04);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  animation: cardPopIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+/* alternating tilt */
+.polaroid-card:nth-child(odd) {
+  transform: rotate(-2.5deg);
+}
+.polaroid-card:nth-child(even) {
+  transform: rotate(2deg);
+}
+.polaroid-card:hover {
+  transform: rotate(0deg) translateY(-4px) scale(1.03) !important;
+  box-shadow:
+    0 12px 28px rgba(0,0,0,0.15),
+    0 2px 6px rgba(0,0,0,0.08);
+}
         .polaroid-card:hover {
           transform: translateY(-3px) rotate(0.4deg);
           box-shadow:
@@ -799,13 +783,13 @@ function Step2({
 
         /* Photo area */
         .polaroid-photo-wrap {
-          width: 100%;
-          aspect-ratio: 1;
-          background: linear-gradient(135deg, #f5f0e8 0%, #edf4f8 100%);
-          border-radius: 2px;
-          overflow: hidden;
-          position: relative;
-        }
+  width: 100%;
+  aspect-ratio: 4/5;   /* ← was 1/1, now taller */
+  background: linear-gradient(135deg, #f5f0e8 0%, #edf4f8 100%);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
         .upload-photo-btn {
           width: 100%;
           height: 100%;
@@ -878,19 +862,19 @@ function Step2({
           position: relative;
         }
         .polaroid-textarea {
-          width: 100%;
-          border: none;
-          border-top: 1px solid #f0ece4;
-          padding: 0.5rem 0.25rem 1.2rem;
-          font-size: 0.8rem;
-          font-family: 'Georgia', serif;
-          color: #2D2D2D;
-          resize: none;
-          outline: none;
-          background: transparent;
-          line-height: 1.5;
-          box-sizing: border-box;
-        }
+  width: 100%;
+  border: none;
+  border-top: 1px solid #f0ece4;
+  padding: 0.35rem 0.25rem 1rem;  /* ← reduced padding */
+  font-size: 0.75rem;              /* ← slightly smaller */
+  font-family: 'Georgia', serif;
+  color: #2D2D2D;
+  resize: none;
+  outline: none;
+  background: transparent;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
         .polaroid-textarea::placeholder { color: #ccc; font-style: italic; }
         .msg-counter {
           position: absolute;

@@ -1173,7 +1173,7 @@ export default function RecipientPage() {
   (async () => {
     const { data: surpriseData, error: sErr } = await supabase
       .from("surprises")
-      .select(`*, balloons(*) `)
+      .select("*")
       .eq("unique_slug", slug)
       .single();
 
@@ -1195,13 +1195,14 @@ export default function RecipientPage() {
       return;
     }
 
-    // extract balloons from the joined result, sorted by order_index
-    const balloonData = (surpriseData.balloons ?? []).sort(
-      (a: any, b: any) => a.order_index - b.order_index
-    );
+    const { data: balloonData } = await supabase
+      .from("balloons")
+      .select("*")
+      .eq("surprise_id", surpriseData.id)
+      .order("order_index");
 
     setSurprise(surpriseData);
-    setBalloons(balloonData);
+    setBalloons(balloonData ?? []);
     setLoading(false);
   })();
 }, [slug]);
