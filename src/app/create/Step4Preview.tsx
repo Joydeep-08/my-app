@@ -1004,7 +1004,15 @@ function FinalizeModal({
     setPayError("");
 
     try {
-      const orderRes = await fetch("/api/create-razorpay-order", { method: "POST" });
+      const orderRes = await fetch("/api/create-razorpay-order", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    coupon, // from your state
+  }),
+});
       if (!orderRes.ok) throw new Error("Could not create payment order. Please try again.");
       const { orderId, amount, currency } = await orderRes.json();
 
@@ -1058,7 +1066,7 @@ function FinalizeModal({
           <div className="fm-price-row">
             <span className="fm-price-label">Surprise Package</span>
             <div className="fm-price-values">
-              <span className="fm-price-inr">₹149</span>
+              <span className="fm-price-inr">₹79</span>
               <span className="fm-price-sep">·</span>
               <span className="fm-price-usd">$2.99</span>
             </div>
