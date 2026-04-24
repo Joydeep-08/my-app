@@ -1,6 +1,6 @@
 "use client";
 
-export const revalidate = 3600
+
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -1168,44 +1168,43 @@ export default function RecipientPage() {
   const [screen, setScreen] = useState<"welcome" | "pop" | "final">("welcome");
 
   useEffect(() => {
-    if (!slug) return;
-    const supabase = createClient();
-    (async () => {
-      const { data: surpriseData, error: sErr } = await supabase
-        .from("surprises")
-        .select("*")
-        .eq("unique_slug", slug)
-        .single();
+  if (!slug) return;
+  const supabase = createClient();
+  (async () => {
+    const { data: surpriseData, error: sErr } = await supabase
+      .from("surprises")
+      .select(`*, balloons(*) `)
+      .eq("unique_slug", slug)
+      .single();
 
-      if (sErr || !surpriseData) {
-        setError("not_found");
-        setLoading(false);
-        return;
-      }
-
-      if (surpriseData.status !== "active") {
-        setError("expired");
-        setLoading(false);
-        return;
-      }
-
-      if (surpriseData.expires_at && new Date(surpriseData.expires_at) < new Date()) {
-        setError("expired");
-        setLoading(false);
-        return;
-      }
-
-      const { data: balloonData } = await supabase
-        .from("balloons")
-        .select("*")
-        .eq("surprise_id", surpriseData.id)
-        .order("order_index");
-
-      setSurprise(surpriseData);
-      setBalloons(balloonData ?? []);
+    if (sErr || !surpriseData) {
+      setError("not_found");
       setLoading(false);
-    })();
-  }, [slug]);
+      return;
+    }
+
+    if (surpriseData.status !== "active") {
+      setError("expired");
+      setLoading(false);
+      return;
+    }
+
+    if (surpriseData.expires_at && new Date(surpriseData.expires_at) < new Date()) {
+      setError("expired");
+      setLoading(false);
+      return;
+    }
+
+    // extract balloons from the joined result, sorted by order_index
+    const balloonData = (surpriseData.balloons ?? []).sort(
+      (a: any, b: any) => a.order_index - b.order_index
+    );
+
+    setSurprise(surpriseData);
+    setBalloons(balloonData);
+    setLoading(false);
+  })();
+}, [slug]);
 
   const theme = surprise ? getTheme(surprise.occasion) : getTheme("Other");
 
