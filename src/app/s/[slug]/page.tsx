@@ -170,6 +170,32 @@ const THEMES: Record<string, {
     tagline: "With all my love, for you 💕",
     starColors: ["#E8A0A0", "#F5D5C8", "#fff0f0"],
   },
+  "Girlfriend's Day": {
+  gradient: "linear-gradient(135deg, #fff0f5 0%, #fce4ec 40%, #f3e5f5 100%)",
+  cardBg: "rgba(255,245,250,0.94)",
+  accent: "#D4607A",
+  accentShine: "#e88fa3",
+  accentString: "#a83858",
+  text: "#2A0A18",
+  subtext: "#6A2840",
+  border: "rgba(212,96,122,0.3)",
+  confettiColors: ["#D4607A", "#E8A0B4", "#C9A0C8", "#F5C2D0", "#FF8FAB"],
+  floatingEmojis: ["💕", "🌸", "💋", "🦋", "✨", "🌺", "💗"],
+  balloonColors: [
+    { body: "#D4607A", shine: "#e88fa3", string: "#a83858" },
+    { body: "#E8A0B4", shine: "#f0bfcc", string: "#c07888" },
+    { body: "#C9A0C8", shine: "#debede", string: "#a078a0" },
+    { body: "#F5C2D0", shine: "#ffdae4", string: "#d090a0" },
+    { body: "#FF8FAB", shine: "#ffadc4", string: "#cc6080" },
+    { body: "#D4607A", shine: "#e88fa3", string: "#a83858" },
+    { body: "#E8A0B4", shine: "#f0bfcc", string: "#c07888" },
+    { body: "#C9A0C8", shine: "#debede", string: "#a078a0" },
+    { body: "#F5C2D0", shine: "#ffdae4", string: "#d090a0" },
+  ],
+  label: "Girlfriend's Day",
+  tagline: "Because every day with you is a love story 💕",
+  starColors: ["#E8A0B4", "#C9A0C8", "#fff0f5"],
+},
   "Women's Day": {
     gradient: "linear-gradient(135deg, #f5f0ff 0%, #ffe0f5 50%, #e8f5e8 100%)",
     cardBg: "rgba(250,245,255,0.93)",
@@ -301,6 +327,19 @@ const THEMES: Record<string, {
     starColors: ["#B8A9C9", "#6BA3BE", "#f0f5ff"],
   },
 };
+const OCCASION_MUSIC: Record<string, string> = {
+  "Birthday": "AYZlME0mQB8",           // Birthday – Katy Perry
+  "Anniversary": "2takcmxWiqU",         // Perfect – Ed Sheeran
+  "Wedding": "oyDGsTCmtIs",             // Kabira instrumental
+  "Mother's Day": "3HFBFrQJBKs",        // Maa – Taare Zameen Par
+  "Father's Day": "gzAIGissHDs",        // Papa Kehte Hain
+  "Friendship Day": "2P7fcKBRa_I",      // Tera Yaar Hoon Main
+  "Women's Day": "VF-r7WG_Qzg",        // Run the World – Beyoncé
+  "Girlfriend's Day": "nfWlot6h_JM", // Lover – Taylor Swift
+  "Farewell": "RgKAFK5djSk",            // See You Again – Wiz Khalifa
+  "Valentine's Day": "XclDkLEkCd8",     // Wanna Be Yours – Arctic Monkeys
+};
+
 
 function getTheme(occasion: string) {
   return THEMES[occasion] ?? THEMES["Other"];
@@ -547,24 +586,61 @@ function PopScreen({
   }, [theme]);
 
   function playPopSound() {
-    try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const bufferSize = ctx.sampleRate * 0.08;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-      }
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      const gainNode = ctx.createGain();
-      gainNode.gain.setValueAtTime(1.2, ctx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-      source.connect(gainNode);
-      gainNode.connect(ctx.destination);
-      source.start();
-    } catch (e) {}
-  }
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+
+    // ── Low thud (body of the explosion) ──────────────────────────────────
+    const thudOsc = ctx.createOscillator();
+    const thudGain = ctx.createGain();
+    thudOsc.type = "sine";
+    thudOsc.frequency.setValueAtTime(120, ctx.currentTime);
+    thudOsc.frequency.exponentialRampToValueAtTime(35, ctx.currentTime + 0.18);
+    thudGain.gain.setValueAtTime(2.8, ctx.currentTime);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+    thudOsc.connect(thudGain);
+    thudGain.connect(ctx.destination);
+    thudOsc.start();
+    thudOsc.stop(ctx.currentTime + 0.22);
+
+    // ── Noise burst (the "crack") ──────────────────────────────────────────
+    const bufferSize = ctx.sampleRate * 0.18;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 1.5);
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    // Band-pass to give it a punchy "pop" character
+    const bandpass = ctx.createBiquadFilter();
+    bandpass.type = "bandpass";
+    bandpass.frequency.value = 800;
+    bandpass.Q.value = 0.7;
+
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(3.5, ctx.currentTime);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+
+    noise.connect(bandpass);
+    bandpass.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start();
+
+    // ── Sub-bass click for impact ──────────────────────────────────────────
+    const clickOsc = ctx.createOscillator();
+    const clickGain = ctx.createGain();
+    clickOsc.type = "sine";
+    clickOsc.frequency.setValueAtTime(60, ctx.currentTime);
+    clickGain.gain.setValueAtTime(4.0, ctx.currentTime);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+    clickOsc.connect(clickGain);
+    clickGain.connect(ctx.destination);
+    clickOsc.start();
+    clickOsc.stop(ctx.currentTime + 0.06);
+
+  } catch (e) {}
+}
 
   async function handlePop(id: string, e: React.MouseEvent) {
     if (popped.has(id)) return;
@@ -962,6 +1038,113 @@ function FinalMessageScreen({
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
+function BgMusic({ occasion }: { occasion: string }) {
+  const videoId = OCCASION_MUSIC[occasion];
+  const [muted, setMuted] = useState(false);
+  const [ready, setReady] = useState(false);
+  const playerRef = useRef<any>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    if (!videoId) return;
+
+    // Load YouTube IFrame API
+    if (!(window as any).YT) {
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(tag);
+    }
+
+    const initPlayer = () => {
+      if (!(window as any).YT?.Player) return;
+      playerRef.current = new (window as any).YT.Player(`yt-bg-player-${occasion.replace(/\s/g, "")}`, {
+        videoId,
+        playerVars: {
+          autoplay: 1,
+          loop: 1,
+          playlist: videoId,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          modestbranding: 1,
+          playsinline: 1,
+        },
+        events: {
+          onReady: (e: any) => {
+            e.target.setVolume(60);
+            e.target.playVideo();
+            setReady(true);
+          },
+        },
+      });
+    };
+
+    if ((window as any).YT?.Player) {
+      initPlayer();
+    } else {
+      (window as any).onYouTubeIframeAPIReady = initPlayer;
+    }
+
+    return () => {
+      playerRef.current?.destroy?.();
+    };
+  }, [videoId]);
+
+  function toggleMute() {
+    if (!playerRef.current) return;
+    if (muted) {
+      playerRef.current.unMute();
+      playerRef.current.setVolume(60);
+    } else {
+      playerRef.current.mute();
+    }
+    setMuted(!muted);
+  }
+
+  if (!videoId) return null;
+
+  return (
+    <>
+      <div
+        id={`yt-bg-player-${occasion.replace(/\s/g, "")}`}
+        style={{
+          position: "fixed", bottom: -9999, left: -9999,
+          width: 1, height: 1, opacity: 0, pointerEvents: "none",
+          zIndex: -1,
+        }}
+      />
+      {ready && (
+        <button
+          onClick={toggleMute}
+          title={muted ? "Unmute music" : "Mute music"}
+          style={{
+            position: "fixed",
+            bottom: "1.5rem",
+            right: "1.25rem",
+            zIndex: 200,
+            width: 42,
+            height: 42,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.88)",
+            backdropFilter: "blur(12px)",
+            border: "1.5px solid rgba(255,255,255,0.95)",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+            fontSize: "1.2rem",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "transform 0.15s, box-shadow 0.15s",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.12)")}
+          onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+        >
+          {muted ? "🔇" : "🎵"}
+        </button>
+      )}
+    </>
+  );
+}
 
 export default function RecipientPage() {
   const params = useParams();
@@ -1081,6 +1264,7 @@ export default function RecipientPage() {
   return (
     <div className="recipient-root">
       <div className="recipient-bg" />
+      {surprise && <BgMusic occasion={surprise.occasion} />}
 
       {screen === "welcome" && (
         <WelcomeScreen

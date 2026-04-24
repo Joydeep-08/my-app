@@ -20,6 +20,7 @@ const OCCASIONS = [
   "Wedding",
   "Women's Day",
   "Valentine's Day",
+  "Girlfriend's Day",
   "Mother's Day",
   "Father's Day",
   "Friendship Day",
