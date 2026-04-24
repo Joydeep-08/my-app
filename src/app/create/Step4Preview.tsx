@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
+
+import { forwardRef, useImperativeHandle, useRef } from "react";
 
 interface Balloon {
   id: string;
@@ -1349,11 +1351,19 @@ interface RazorpayOptions {
   modal: { ondismiss: () => void };
   prefill?: { email?: string; contact?: string };
 }
-function BgMusic({ occasion }: { occasion: string }) {
+const BgMusic = forwardRef(function BgMusic(
+  { occasion }: { occasion: string },
+  ref: React.Ref<{ play: () => void }>
+) {
   const videoId = OCCASION_MUSIC[occasion];
   const [muted, setMuted] = useState(false);
   const [ready, setReady] = useState(false);
   const playerRef = useRef<any>(null);
+  useImperativeHandle(ref, () => ({
+  play() {
+    playerRef.current?.playVideo?.();
+  }
+}));
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -1383,17 +1393,9 @@ function BgMusic({ occasion }: { occasion: string }) {
         },
         events: {
           onReady: (e: any) => {
-            e.target.setVolume(60);
-            setReady(true);
-            // Play on first user interaction
-            const startMusic = () => {
-              e.target.playVideo();
-              window.removeEventListener("click", startMusic);
-              window.removeEventListener("touchstart", startMusic);
-            };
-            window.addEventListener("click", startMusic);
-            window.addEventListener("touchstart", startMusic);
-          },
+  e.target.setVolume(60);
+  setReady(true);
+},
         },
       }
     );
@@ -1464,7 +1466,7 @@ function BgMusic({ occasion }: { occasion: string }) {
       )}
     </>
   );
-}
+});
 // ─── Root ─────────────────────────────────────────────────────────────────────
 export default function Step4Preview({
   recipientName,
@@ -1474,6 +1476,7 @@ export default function Step4Preview({
   onEditSurprise,
 }: Step4Props) {
   const [screen, setScreen] = useState<PreviewScreen>("welcome");
+  const bgMusicRef = useRef<{ play: () => void } | null>(null);
   const [showFinalizeModal, setShowFinalizeModal] = useState(false);
   const [isFinalizingPayment, setIsFinalizingPayment] = useState(false);
   const [finalizeError, setFinalizeError] = useState("");
@@ -1522,7 +1525,7 @@ export default function Step4Preview({
   return (
     <div className="preview-root">
       <div className="preview-bg" />
-      <BgMusic occasion={occasion} />
+      <BgMusic occasion={occasion} ref={bgMusicRef} />
 
       {/* ── Banner ── */}
       <div className="preview-banner">
@@ -1546,7 +1549,10 @@ export default function Step4Preview({
         <WelcomeScreen
           recipientName={recipientName}
           occasion={occasion}
-          onStart={() => setScreen("pop")}
+          onStart={() => {
+  bgMusicRef.current?.play();
+  setScreen("pop");
+}}
           theme={theme}
         />
       )}

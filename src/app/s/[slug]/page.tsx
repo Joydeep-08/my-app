@@ -1,8 +1,8 @@
 "use client";
 
+import { forwardRef, useImperativeHandle, useRef } from "react";
 
-
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useParams } from "next/navigation";
 
@@ -1040,11 +1040,19 @@ function FinalMessageScreen({
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
-function BgMusic({ occasion }: { occasion: string }) {
+const BgMusic = forwardRef(function BgMusic(
+  { occasion }: { occasion: string },
+  ref: React.Ref<{ play: () => void }>
+) {
   const videoId = OCCASION_MUSIC[occasion];
   const [muted, setMuted] = useState(false);
   const [ready, setReady] = useState(false);
   const playerRef = useRef<any>(null);
+  useImperativeHandle(ref, () => ({
+  play() {
+    playerRef.current?.playVideo?.();
+  }
+}));
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -1074,17 +1082,9 @@ function BgMusic({ occasion }: { occasion: string }) {
         },
         events: {
           onReady: (e: any) => {
-            e.target.setVolume(60);
-            setReady(true);
-            // Play on first user interaction
-            const startMusic = () => {
-              e.target.playVideo();
-              window.removeEventListener("click", startMusic);
-              window.removeEventListener("touchstart", startMusic);
-            };
-            window.addEventListener("click", startMusic);
-            window.addEventListener("touchstart", startMusic);
-          },
+  e.target.setVolume(60);
+  setReady(true);
+},
         },
       }
     );
@@ -1155,7 +1155,7 @@ function BgMusic({ occasion }: { occasion: string }) {
       )}
     </>
   );
-}
+});
 
 export default function RecipientPage() {
   const params = useParams();
@@ -1166,6 +1166,7 @@ export default function RecipientPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [screen, setScreen] = useState<"welcome" | "pop" | "final">("welcome");
+  const bgMusicRef = useRef<{ play: () => void } | null>(null);
 
   useEffect(() => {
   if (!slug) return;
@@ -1275,13 +1276,16 @@ export default function RecipientPage() {
   return (
     <div className="recipient-root">
       <div className="recipient-bg" />
-      {surprise && <BgMusic occasion={surprise.occasion} />}
+      {surprise && <BgMusic occasion={surprise.occasion} ref={bgMusicRef} />}
 
       {screen === "welcome" && (
         <WelcomeScreen
           recipientName={surprise.recipient_name}
           occasion={surprise.occasion}
-          onStart={() => setScreen("pop")}
+          onStart={() => {
+  bgMusicRef.current?.play();
+  setScreen("pop");
+}}
           theme={theme}
         />
       )}
