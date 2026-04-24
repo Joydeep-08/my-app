@@ -330,7 +330,7 @@ const OCCASION_MUSIC: Record<string, string> = {
   "Father's Day": "gzAIGissHDs",        // Papa Kehte Hain
   "Friendship Day": "2P7fcKBRa_I",      // Tera Yaar Hoon Main
   "Women's Day": "VF-r7WG_Qzg",        // Run the World – Beyoncé
-  "Girlfriend's Day": "nfWlot6h_JM", // Lover – Taylor Swift
+  "Girlfriend's Day": "QJO3ROT-A4E", // you're beautiful 1D
   "Farewell": "RgKAFK5djSk",            // See You Again – Wiz Khalifa
   "Valentine's Day": "XclDkLEkCd8",     // Wanna Be Yours – Arctic Monkeys
 };
