@@ -44,18 +44,48 @@ async function getCroppedBase64(imageSrc: string, pixelCrop: CropArea): Promise<
     img.addEventListener("error", reject);
     img.src = imageSrc;
   });
+
+  // Fix output size to 800x800 — reduces file size dramatically
   const canvas = document.createElement("canvas");
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+  canvas.width = 800;
+  canvas.height = 800;
   const ctx = canvas.getContext("2d")!;
+
+  // Step 1: Draw the cropped image scaled to 800x800
   ctx.drawImage(
     image,
     pixelCrop.x, pixelCrop.y,
     pixelCrop.width, pixelCrop.height,
     0, 0,
-    pixelCrop.width, pixelCrop.height
+    800, 800
   );
-  return canvas.toDataURL("image/jpeg", 0.92);
+
+  // Step 2: Warm yellow-orange tint (old digicam white balance)
+  ctx.globalCompositeOperation = "multiply";
+  ctx.fillStyle = "rgba(255, 215, 140, 0.16)";
+  ctx.fillRect(0, 0, 800, 800);
+
+  // Step 3: Vignette — dark edges like a cheap lens
+  ctx.globalCompositeOperation = "source-over";
+  const vignette = ctx.createRadialGradient(400, 400, 180, 400, 400, 580);
+  vignette.addColorStop(0, "rgba(0,0,0,0)");
+  vignette.addColorStop(1, "rgba(0,0,0,0.32)");
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, 800, 800);
+
+  // Step 4: Grain — old sensor noise
+  const imageData = ctx.getImageData(0, 0, 800, 800);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const grain = (Math.random() - 0.5) * 28;
+    data[i]     = Math.min(255, Math.max(0, data[i]     + grain));
+    data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + grain));
+    data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + grain));
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  // Step 5: Export — jpeg 0.72 gives digicam compression artifacts + ~150-250KB
+  return canvas.toDataURL("image/jpeg", 0.72);
 }
 
 // ─── Crop Modal ───────────────────────────────────────────────────────────────

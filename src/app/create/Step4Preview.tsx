@@ -1,17 +1,7 @@
 "use client";
-import imageCompression from "browser-image-compression";
+
 import { useState, useCallback, useRef, useEffect } from "react";
-async function handleImageUpload(file: File) {
-  const options = {
-    maxSizeMB: 0.3, // 🔥 keep under 300kb
-    maxWidthOrHeight: 800,
-    useWebWorker: true,
-  };
 
-  const compressedFile = await imageCompression(file, options);
-
-  return compressedFile;
-}
 interface Balloon {
   id: string;
   message: string;

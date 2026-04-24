@@ -1,5 +1,7 @@
 "use client";
 
+export const revalidate = 3600
+
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useParams } from "next/navigation";
