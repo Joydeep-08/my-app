@@ -1,58 +1,204 @@
+"use client";
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#f5f7f4] to-[#e6efe6] text-gray-800">
-
+    <main
+      style={{
+        minHeight: "100vh",
+        background:
+          "radial-gradient(circle at 20% 20%, #eaf7ec, transparent), linear-gradient(135deg, #f8faf7, #e4efe6)",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        color: "#1f2937",
+      }}
+    >
       {/* NAVBAR */}
-      <nav className="max-w-6xl mx-auto flex justify-between items-center px-6 py-6">
-        <h1 className="text-xl font-semibold">🎁 Create My Surprise</h1>
+      <div
+        style={{
+          maxWidth: "1100px",
+          margin: "0 auto",
+          padding: "24px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1 style={{ fontSize: "20px", fontWeight: 600 }}>
+          🎁 Create My Surprise
+        </h1>
+
         <a
           href="/login"
-          className="px-4 py-2 bg-[#9CAF88] text-white rounded-lg"
+          style={{
+            padding: "10px 20px",
+            background: "rgba(0,0,0,0.85)",
+            color: "white",
+            borderRadius: "999px",
+            textDecoration: "none",
+            fontSize: "14px",
+            boxShadow: "0 5px 15px rgba(0,0,0,0.15)",
+          }}
         >
           Login
         </a>
-      </nav>
+      </div>
 
       {/* HERO */}
-      <section className="max-w-4xl mx-auto text-center mt-24 px-6">
-        <h1 className="text-5xl font-bold mb-6">
-          Create unforgettable <span className="text-[#9CAF88]">surprises</span>
+      <div
+        style={{
+          maxWidth: "850px",
+          margin: "100px auto 60px",
+          textAlign: "center",
+          padding: "0 20px",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "54px",
+            fontWeight: 700,
+            lineHeight: 1.15,
+            letterSpacing: "-1px",
+          }}
+        >
+          Create unforgettable{" "}
+          <span
+            style={{
+              background:
+                "linear-gradient(90deg, #16a34a, #4ade80, #22c55e)",
+              WebkitBackgroundClip: "text",
+              color: "transparent",
+            }}
+          >
+            digital surprises
+          </span>
         </h1>
 
-        <p className="text-lg text-gray-600 mb-8">
-          Send magical, interactive experiences to your loved ones ✨
+        <p
+          style={{
+            marginTop: "24px",
+            color: "#4b5563",
+            fontSize: "18px",
+            lineHeight: 1.6,
+          }}
+        >
+          Send magical, interactive experiences ✨  
+          that people actually remember.
         </p>
 
-        <div className="flex justify-center gap-4">
+        <div style={{ marginTop: "40px" }}>
           <a
             href="/login"
-            className="px-6 py-3 bg-[#9CAF88] text-white rounded-xl shadow"
+            style={{
+              padding: "14px 28px",
+              background:
+                "linear-gradient(90deg, #16a34a, #22c55e)",
+              color: "white",
+              borderRadius: "12px",
+              textDecoration: "none",
+              fontWeight: 500,
+              boxShadow: "0 10px 30px rgba(34,197,94,0.3)",
+              transition: "all 0.2s ease",
+            }}
           >
-            Get Started
+            Get Started 🚀
           </a>
-
-          <button className="px-6 py-3 border rounded-xl">
-            View Demo
-          </button>
         </div>
-      </section>
+      </div>
 
       {/* FEATURES */}
-      <section className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6 mt-24 px-6 pb-20">
+      <div
+        style={{
+          maxWidth: "1100px",
+          margin: "40px auto",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gap: "24px",
+          padding: "20px",
+        }}
+      >
         {[
-          "💌 Personal messages",
-          "🎈 Interactive surprises",
-          "🔗 Shareable links",
+          {
+            title: "💌 Personal Messages",
+            desc: "Write something that actually hits, not generic stuff.",
+          },
+          {
+            title: "🎈 Interactive Surprises",
+            desc: "Clicks, reveals, animations. Make it feel alive.",
+          },
+          {
+            title: "🔗 Shareable Links",
+            desc: "One link. Instant reaction. No friction.",
+          },
         ].map((item, i) => (
           <div
             key={i}
-            className="bg-white p-6 rounded-2xl shadow-md text-center"
+            style={{
+              background: "rgba(255,255,255,0.65)",
+              backdropFilter: "blur(12px)",
+              padding: "26px",
+              borderRadius: "18px",
+              boxShadow:
+                "0 15px 40px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(255,255,255,0.4)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-6px)";
+              e.currentTarget.style.boxShadow =
+                "0 25px 60px rgba(0,0,0,0.12)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow =
+                "0 15px 40px rgba(0,0,0,0.08)";
+            }}
           >
-            <p className="font-medium">{item}</p>
+            <h3 style={{ fontSize: "18px", fontWeight: 600 }}>
+              {item.title}
+            </h3>
+            <p
+              style={{
+                marginTop: "10px",
+                color: "#555",
+                lineHeight: 1.5,
+              }}
+            >
+              {item.desc}
+            </p>
           </div>
         ))}
-      </section>
+      </div>
 
+      {/* CTA */}
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: "100px",
+          paddingBottom: "80px",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "30px",
+            fontWeight: 600,
+          }}
+        >
+          Make someone smile today ✨
+        </h2>
+
+        <a
+          href="/login"
+          style={{
+            display: "inline-block",
+            marginTop: "24px",
+            padding: "14px 32px",
+            background: "#111",
+            color: "white",
+            borderRadius: "999px",
+            textDecoration: "none",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+          }}
+        >
+          Start Creating →
+        </a>
+      </div>
     </main>
   );
 }
