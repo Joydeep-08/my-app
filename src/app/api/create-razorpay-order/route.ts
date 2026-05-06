@@ -2,6 +2,15 @@
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  // ✅ Check env vars first
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    console.error("Missing Razorpay env vars!");
+    return NextResponse.json(
+      { error: "Payment configuration error" },
+      { status: 500 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { coupon } = body;
@@ -20,7 +29,7 @@ export async function POST(req: Request) {
     let finalPrice = basePrice;
 
     //if (coupon === "LOVE50") {
-    // finalPrice = basePrice - 50;
+    //  finalPrice = basePrice - 50;
     //}
 
     //if (coupon === "FIRST20") {
