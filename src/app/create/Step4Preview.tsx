@@ -328,7 +328,7 @@ const OCCASION_MUSIC: Record<string, string> = {
   "Birthday": "AYZlME0mQB8",           // Birthday – Katy Perry
   "Anniversary": "2takcmxWiqU",         // Perfect – Ed Sheeran
   "Wedding": "oyDGsTCmtIs",             // Kabira instrumental
-  "Mother's Day": "3HFBFrQJBKs",        // Maa – Taare Zameen Par
+  "Mother's Day": "hlWiI4xVXKY",   // Sunny Mornings – Peder B. Helland (calm warm instrumental)
   "Father's Day": "gzAIGissHDs",        // Papa Kehte Hain
   "Friendship Day": "2P7fcKBRa_I",      // Tera Yaar Hoon Main
   "Women's Day": "VF-r7WG_Qzg",        // Run the World – Beyoncé
