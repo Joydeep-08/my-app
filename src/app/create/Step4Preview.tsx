@@ -1143,19 +1143,7 @@ function FinalizeModal({
           <div className="fm-price-row">
             <span className="fm-price-label">Surprise Package</span>
             <div className="fm-price-values">
-              <div className="flex items-center justify-end gap-2">
-  <span className="text-lg text-gray-400 line-through">
-    ₹199
-  </span>
-
-  <span className="text-4xl font-bold text-[#C08497]">
-    ₹79
-  </span>
-
-  <span className="text-sm text-gray-400">
-    ~$2.99
-  </span>
-</div>
+              <span className="fm-price-inr">₹79</span>
               <span className="fm-price-sep">·</span>
               <span className="fm-price-usd">$2.99</span>
             </div>
