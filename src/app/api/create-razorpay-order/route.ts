@@ -28,9 +28,9 @@ export async function POST(req: Request) {
     // 🎟️ Coupon logic
     let finalPrice = basePrice;
 
-    //if (coupon === "LOVE50") {
-    //  finalPrice = basePrice - 50;
-    //}
+    if (coupon === "AASTHA50") {
+      finalPrice = basePrice - 50;
+    }
 
     //if (coupon === "FIRST20") {
     //  finalPrice = basePrice - 20;
