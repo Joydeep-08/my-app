@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
       occasion,
       finalMessage,
       coupon,
+      finalPrice,
       balloons, // Array<{ id: string; message: string; imageBase64: string | null }>
     } = body;
 
@@ -143,7 +144,10 @@ export async function POST(req: NextRequest) {
     }
 // After payment is confirmed, increment the creator's usage count
 if (coupon && coupon !== "none") {
-  await supabase.rpc("increment_coupon_usage", { p_code: coupon });
+  await supabase.rpc("increment_coupon_usage", {
+  p_code: coupon,
+  p_amount: finalPrice,
+});
 }
     // ── 8. Return slug ─────────────────────────────────────────────────────
     return NextResponse.json({ success: true, slug });
