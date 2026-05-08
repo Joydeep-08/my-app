@@ -20,6 +20,7 @@ interface Step4Props {
   onEditSurprise: () => void;
 }
 
+
 // ─── Theme System (mirrored from recipient page) ──────────────────────────────
 const THEMES: Record<string, {
   gradient: string;
