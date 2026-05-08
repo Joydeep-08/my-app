@@ -1067,23 +1067,28 @@ function FinalizeModal({
   const [isLoading, setIsLoading] = useState(false);
   const [payError, setPayError] = useState("");
 
+  const [displayPrice, setDisplayPrice] = useState(79);
+
   function handleApplyCoupon() {
   const normalizedCoupon = coupon.trim().toUpperCase();
 
   if (!normalizedCoupon) {
     setCouponError("Please enter a coupon code.");
     setCouponApplied(false);
+    setDisplayPrice(79);
     return;
   }
 
   if (normalizedCoupon === "AASTHA50") {
     setCouponApplied(true);
     setCouponError("");
+    setDisplayPrice(49); // 79 - 30
     return;
   }
 
   setCouponError("Invalid or expired coupon code.");
   setCouponApplied(false);
+  setDisplayPrice(79);
 }
 
   async function handlePayNow() {
@@ -1153,7 +1158,28 @@ function FinalizeModal({
           <div className="fm-price-row">
             <span className="fm-price-label">Surprise Package</span>
             <div className="fm-price-values">
-              <span className="fm-price-inr">₹79</span>
+              <div className="fm-price-values">
+  {couponApplied ? (
+    <>
+      <span
+        style={{
+          textDecoration: "line-through",
+          opacity: 0.5,
+          marginRight: "8px",
+        }}
+      >
+        ₹79
+      </span>
+
+      <span className="fm-price-inr">₹{displayPrice}</span>
+    </>
+  ) : (
+    <span className="fm-price-inr">₹{displayPrice}</span>
+  )}
+
+  <span className="fm-price-sep">·</span>
+  <span className="fm-price-usd">$2.99</span>
+</div>
               <span className="fm-price-sep">·</span>
               <span className="fm-price-usd">$2.99</span>
             </div>

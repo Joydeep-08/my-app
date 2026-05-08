@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     let finalPrice = basePrice;
 
     if (coupon === "AASTHA50") {
-      finalPrice = basePrice - 50;
+      finalPrice = basePrice - 30;
     }
 
     //if (coupon === "FIRST20") {
