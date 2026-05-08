@@ -1051,6 +1051,7 @@ function FinalMessageScreen({
 function FinalizeModal({
   onClose,
   onPaymentSuccess,
+  onCouponApplied,
   theme,
 }: {
   onClose: () => void;
@@ -1059,6 +1060,7 @@ function FinalizeModal({
     razorpay_payment_id: string;
     razorpay_signature: string;
   }) => void;
+  onCouponApplied: (code: string) => void;
   theme: ReturnType<typeof getTheme>;
 }) {
   const [coupon, setCoupon] = useState("");
@@ -1083,6 +1085,7 @@ function FinalizeModal({
     setCouponApplied(true);
     setCouponError("");
     setDisplayPrice(49); // 79 - 30
+    onCouponApplied(normalizedCoupon);
     return;
   }
 
@@ -1516,6 +1519,7 @@ export default function Step4Preview({
   const [showFinalizeModal, setShowFinalizeModal] = useState(false);
   const [isFinalizingPayment, setIsFinalizingPayment] = useState(false);
   const [finalizeError, setFinalizeError] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState("");
 
   const theme = getTheme(occasion);
   const allBalloonsPopped = screen === "final";
@@ -1539,6 +1543,7 @@ export default function Step4Preview({
           recipientName,
           occasion,
           finalMessage,
+           coupon: appliedCoupon,
           balloons,
         }),
       });
@@ -1632,6 +1637,7 @@ export default function Step4Preview({
         <FinalizeModal
           onClose={() => setShowFinalizeModal(false)}
           onPaymentSuccess={handlePaymentSuccess}
+          onCouponApplied={setAppliedCoupon}
           theme={theme}
         />
       )}

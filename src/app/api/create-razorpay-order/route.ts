@@ -1,51 +1,59 @@
-// app/api/create-razorpay-order/route.ts
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+// Connect to your Supabase database
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!  // use service role key, not anon key
+);
 
 export async function POST(req: Request) {
-  // ✅ Check env vars first
   if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-    console.error("Missing Razorpay env vars!");
-    return NextResponse.json(
-      { error: "Payment configuration error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Payment configuration error" }, { status: 500 });
   }
 
   try {
-    const body = await req.json();
-    const { coupon } = body;
+    const { coupon } = await req.json();
 
     const Razorpay = (await import("razorpay")).default;
-
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID!,
       key_secret: process.env.RAZORPAY_KEY_SECRET!,
     });
 
-    // 💰 Base price
     const basePrice = 79;
-
-    // 🎟️ Coupon logic
     let finalPrice = basePrice;
+    let creatorName = "none";
 
-    if (coupon === "AASTHA50") {
-      finalPrice = basePrice - 30;
+    // If the user entered a coupon code...
+    if (coupon) {
+      // Look it up in your Supabase table
+      const { data, error } = await supabase
+        .from("coupon_codes")
+        .select("*")
+        .eq("code", coupon.trim().toUpperCase())
+        .single();
+
+      // If code doesn't exist in the table, reject it
+      if (error || !data) {
+        return NextResponse.json({ error: "Invalid coupon code" }, { status: 400 });
+      }
+
+      // Apply the discount from the database
+      finalPrice = Math.max(basePrice - data.discount_amount, 1);
+      creatorName = data.creator_name; // e.g. "Aastha"
     }
 
-    //if (coupon === "FIRST20") {
-    //  finalPrice = basePrice - 20;
-    //}
-
-    // Prevent negative price (just in case)
-    finalPrice = Math.max(finalPrice, 1);
-
+    // Create the Razorpay order
+    // The "notes" field is just extra info attached to the order
+    // You can see these notes inside your Razorpay dashboard too!
     const order = await razorpay.orders.create({
-      amount: finalPrice * 100, // paisa
+      amount: finalPrice * 100,
       currency: "INR",
       receipt: `surprise_${Date.now()}`,
       notes: {
-        product: "SurpriseGift",
         coupon: coupon || "none",
+        referred_by: creatorName,   // 👈 this is the key part
       },
     });
 
@@ -55,11 +63,9 @@ export async function POST(req: Request) {
       currency: order.currency,
       finalPrice,
     });
+
   } catch (error) {
     console.error("Razorpay order creation failed:", error);
-    return NextResponse.json(
-      { error: "Failed to create payment order" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create payment order" }, { status: 500 });
   }
 }
