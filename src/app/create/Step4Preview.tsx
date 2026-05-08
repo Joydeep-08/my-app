@@ -1068,14 +1068,23 @@ function FinalizeModal({
   const [payError, setPayError] = useState("");
 
   function handleApplyCoupon() {
-    if (coupon.trim() === "") {
-      setCouponError("Please enter a coupon code.");
-      setCouponApplied(false);
-      return;
-    }
-    setCouponError("Invalid or expired coupon code.");
+  const normalizedCoupon = coupon.trim().toUpperCase();
+
+  if (!normalizedCoupon) {
+    setCouponError("Please enter a coupon code.");
     setCouponApplied(false);
+    return;
   }
+
+  if (normalizedCoupon === "AASTHA50") {
+    setCouponApplied(true);
+    setCouponError("");
+    return;
+  }
+
+  setCouponError("Invalid or expired coupon code.");
+  setCouponApplied(false);
+}
 
   async function handlePayNow() {
     setIsLoading(true);
