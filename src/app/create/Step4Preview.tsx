@@ -1071,7 +1071,7 @@ function FinalizeModal({
 
   const [displayPrice, setDisplayPrice] = useState(79);
 
-  function handleApplyCoupon() {
+ async function handleApplyCoupon() {
   const normalizedCoupon = coupon.trim().toUpperCase();
 
   if (!normalizedCoupon) {
@@ -1081,17 +1081,29 @@ function FinalizeModal({
     return;
   }
 
-  if (normalizedCoupon === "AASTHA50") {
+  try {
+    const res = await fetch("/api/create-razorpay-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ coupon: normalizedCoupon, validateOnly: true }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setCouponError("Invalid or expired coupon code.");
+      setCouponApplied(false);
+      setDisplayPrice(79);
+      return;
+    }
+
     setCouponApplied(true);
     setCouponError("");
-    setDisplayPrice(49); // 79 - 30
+    setDisplayPrice(data.finalPrice);
     onCouponApplied(normalizedCoupon);
-    return;
+  } catch {
+    setCouponError("Could not validate coupon. Try again.");
   }
-
-  setCouponError("Invalid or expired coupon code.");
-  setCouponApplied(false);
-  setDisplayPrice(79);
 }
 
   async function handlePayNow() {
