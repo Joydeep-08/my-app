@@ -1,5 +1,7 @@
 "use client";
 
+import { compressImage } from "@/lib/compressImage";
+
 import Step4Preview from "./Step4Preview";
 
 import { useState, useRef, useCallback } from "react";
@@ -55,7 +57,7 @@ async function getCroppedBase64(imageSrc: string, pixelCrop: CropArea): Promise<
     0, 0,
     pixelCrop.width, pixelCrop.height
   );
-  return canvas.toDataURL("image/jpeg", 0.92);
+  return canvas.toDataURL("image/jpeg", 0.72);
 }
 
 // ─── Crop Modal ───────────────────────────────────────────────────────────────
@@ -283,13 +285,15 @@ function Step2({
 
   // Opens the crop modal instead of storing base64 directly
   function handleImageSelect(id: string, file: File) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setCropSrc(e.target?.result as string);
-      setCropTargetId(id);
-    };
-    reader.readAsDataURL(file);
-  }
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const raw = e.target?.result as string;
+    const compressed = await compressImage(raw);
+    setCropSrc(compressed);
+    setCropTargetId(id);
+  };
+  reader.readAsDataURL(file);
+}
 
   function handleCropSave(croppedBase64: string) {
     if (cropTargetId) updateBalloon(cropTargetId, "imageBase64", croppedBase64);
