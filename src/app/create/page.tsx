@@ -47,9 +47,16 @@ async function getCroppedBase64(imageSrc: string, pixelCrop: CropArea): Promise<
     img.src = imageSrc;
   });
   const canvas = document.createElement("canvas");
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+ const MAX_W = 600;
+const scale = Math.min(1, MAX_W / pixelCrop.width);
+
+canvas.width = pixelCrop.width * scale;
+canvas.height = pixelCrop.height * scale;
   const ctx = canvas.getContext("2d")!;
+
+  ctx.imageSmoothingEnabled = true;
+ctx.imageSmoothingQuality = "high";
+
   ctx.drawImage(
     image,
     pixelCrop.x, pixelCrop.y,
@@ -57,7 +64,7 @@ async function getCroppedBase64(imageSrc: string, pixelCrop: CropArea): Promise<
     0, 0,
     pixelCrop.width, pixelCrop.height
   );
-  return canvas.toDataURL("image/jpeg", 0.72);
+  return canvas.toDataURL("image/webp", 0.55);
 }
 
 // ─── Crop Modal ───────────────────────────────────────────────────────────────
