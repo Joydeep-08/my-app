@@ -304,7 +304,7 @@ export const THEMES: Record<string, {
 
 export const OCCASION_MUSIC: Record<string, string> = {
   "Birthday": "AYZlME0mQB8",
-  "Anniversary": "2takcmxWiqU",
+  "Anniversary": "OSpbQc4DZCA",
   "Wedding": "oyDGsTCmtIs",
   "Mother's Day": "hlWiI4xVXKY",
   "Father's Day": "gzAIGissHDs",

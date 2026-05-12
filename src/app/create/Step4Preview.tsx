@@ -327,7 +327,7 @@ const THEMES: Record<string, {
 };
 const OCCASION_MUSIC: Record<string, string> = {
   "Birthday": "AYZlME0mQB8",           // Birthday – Katy Perry
-  "Anniversary": "2takcmxWiqU",         // Perfect – Ed Sheeran
+  "Anniversary": "OSpbQc4DZCA",         // Perfect – Ed Sheeran
   "Wedding": "oyDGsTCmtIs",             // Kabira instrumental
   "Mother's Day": "hlWiI4xVXKY",   // Sunny Mornings – Peder B. Helland (calm warm instrumental)
   "Father's Day": "gzAIGissHDs",        // Papa Kehte Hain
