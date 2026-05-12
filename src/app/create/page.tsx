@@ -47,11 +47,12 @@ async function getCroppedBase64(imageSrc: string, pixelCrop: CropArea): Promise<
     img.src = imageSrc;
   });
   const canvas = document.createElement("canvas");
- const MAX_W = 600;
-const scale = Math.min(1, MAX_W / pixelCrop.width);
-
-canvas.width = pixelCrop.width * scale;
-canvas.height = pixelCrop.height * scale;
+  // ⚠️ QUALITY NOTE: MAX_W caps resolution to 600px — remove this + scale
+// to restore full resolution. Biggest quality killer in the pipeline.
+canvas.width = pixelCrop.width;   // remove scaling entirely
+canvas.height = pixelCrop.height;
+// ⚠️ QUALITY NOTE: 0.99 = near-lossless. Can lower to 0.85–0.90
+// to balance quality vs upload/storage size.
   const ctx = canvas.getContext("2d")!;
 
   ctx.imageSmoothingEnabled = true;
@@ -64,7 +65,7 @@ ctx.imageSmoothingQuality = "high";
     0, 0,
     pixelCrop.width, pixelCrop.height
   );
-  return canvas.toDataURL("image/webp", 0.55);
+  return canvas.toDataURL("image/webp", 0.99);
 }
 
 // ─── Crop Modal ───────────────────────────────────────────────────────────────
